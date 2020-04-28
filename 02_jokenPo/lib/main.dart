@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+/*
+  Author: Sabrina Karen
+*/
 
+import 'package:flutter/material.dart';
 import 'Game.dart';
 
 void main(){

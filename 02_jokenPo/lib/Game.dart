@@ -1,5 +1,8 @@
-import 'dart:math';
+/*
+  Author: Sabrina Karen
+*/
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class Game extends StatefulWidget {
