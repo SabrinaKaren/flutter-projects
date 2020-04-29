@@ -14,14 +14,16 @@ class DataInput extends StatefulWidget {
 class _DataInputState extends State<DataInput> {
 
   TextEditingController _textEditingController = TextEditingController();
-  num _currentValue = 500.00;
+  double _currentValue = 500.00;
 
-  void _calculateBalance(var valueToBeDebited){
-    valueToBeDebited = num.parse(valueToBeDebited);
-    setState(() {
-      this._currentValue = _currentValue - valueToBeDebited;
-      this._textEditingController = null;
-    });
+  void _calculateBalance(){
+    double valueToBeDebited = double.tryParse(_textEditingController.text);
+    if (valueToBeDebited != null){
+      setState(() {
+        this._currentValue = _currentValue - valueToBeDebited;
+      });
+      _textEditingController.text = "";
+    }
   }
 
   @override
@@ -61,7 +63,7 @@ class _DataInputState extends State<DataInput> {
           ),
           RaisedButton(
             child: Text("Salvar"),
-            onPressed: (){ _calculateBalance(_textEditingController.text); },
+            onPressed: (){ _calculateBalance(); },
           ),
         ],
       ),
