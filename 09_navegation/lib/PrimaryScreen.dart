@@ -27,12 +27,7 @@ class _PrimaryScreenState extends State<PrimaryScreen> {
             RaisedButton(
               child: Text("Ir para a segunda tela", style: TextStyle(fontSize: 20, color: Colors.white),),
               onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SecondaryScreen()
-                    )
-                );
+                Navigator.pushNamed(context, "/secundaria");
               },
               color: Colors.green,
             )
