@@ -30,6 +30,13 @@ class _GameState extends State<Game> {
     });
   }
 
+  void _equals(){
+    setState(() {
+      this._msgStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.deepOrangeAccent);
+      this._msgReturn = "Empatamos ;)";
+    });
+  }
+
   void _executeGame(String userChoice){
 
     var options = ["PEDRA", "PAPEL", "TESOURA"];
@@ -70,9 +77,7 @@ class _GameState extends State<Game> {
     } else if ((appChoice == "PEDRA" && userChoice == "PEDRA") ||
         (appChoice == "PAPEL" && userChoice == "PAPEL") ||
         (appChoice == "TESOURA" && userChoice == "TESOURA")){
-      setState(() {
-        this._msgReturn = "Empatamos!";
-      });
+      this._equals();
     }
 
   }

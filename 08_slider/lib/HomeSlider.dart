@@ -8,7 +8,7 @@ class HomeSlider extends StatefulWidget {
 class _HomeSliderState extends State<HomeSlider> {
 
   double _sliderValue = 3;
-  String _imagePath = "images/emotion_4_5.png";
+  String _imagePath = "images/emotion_2_3.png";
 
   void _send(){
 
