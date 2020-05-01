@@ -1,3 +1,7 @@
+/*
+  Author: Sabrina Karen
+*/
+
 import 'package:flutter/material.dart';
 
 class HomeCheckBox extends StatefulWidget {
