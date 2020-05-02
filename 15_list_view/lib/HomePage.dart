@@ -42,6 +42,36 @@ class _HomePageState extends State<HomePage> {
           itemCount: _listToTest.length,
           itemBuilder: (contex, indice){
             return ListTile(
+              onTap: (){
+                showDialog(
+                    context: context,
+                  builder: (context){
+                      return AlertDialog(
+                        title: Text(
+                          _listToTest[indice]["titulo"]
+                        ),
+                        content: Text(
+                            _listToTest[indice]["descricao"]
+                        ),
+                        contentPadding: EdgeInsets.only(top: 40, bottom: 40, left: 20),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                            child: Text("OK"),
+                          ),
+                          FlatButton(
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                            child: Text("SAIR"),
+                          )
+                        ],
+                      );
+                  }
+                );
+              },
               title: Text( _listToTest[indice]["titulo"]),
               subtitle: Text( _listToTest[indice]["descricao"]),
             );
