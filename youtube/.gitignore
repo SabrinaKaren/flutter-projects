@@ -29,10 +29,10 @@
 .pub-cache/
 .pub/
 /build/
-/lib/Api.dart
 
 # Web related
 lib/generated_plugin_registrant.dart
+lib/Api.dart
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
