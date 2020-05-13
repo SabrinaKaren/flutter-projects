@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "492682128344",
+    "firebase_url": "https://whatsapp-c376e.firebaseio.com",
+    "project_id": "whatsapp-c376e",
+    "storage_bucket": "whatsapp-c376e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492682128344:android:cdeb50d1793d67d13b60ad",
+        "android_client_info": {
+          "package_name": "com.sabrinakaren.whatsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "492682128344-fjma3rhibv6hb58tdmrbrc84dq9l65dr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB30rpetxf0quTaaXMpajII87ApVsLy37o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "492682128344-fjma3rhibv6hb58tdmrbrc84dq9l65dr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
