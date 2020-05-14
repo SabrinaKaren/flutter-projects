@@ -3,6 +3,10 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:whatsapp/data/UserData.dart';
+import 'package:whatsapp/utils/CommonMethods.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -10,27 +14,36 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  // Controladores
-  TextEditingController _controllerName = TextEditingController();
-  TextEditingController _controllerEmail = TextEditingController();
-  TextEditingController _controllerPassword = TextEditingController();
+
+  TextEditingController _controllerName = TextEditingController(text: "Sabrina Karen");
+  TextEditingController _controllerEmail = TextEditingController(text: "sabrinaa.karen@hotmail.com");
+  TextEditingController _controllerPassword = TextEditingController(text: "1234567");
   String _errorMessage = "";
 
   _validateFields() {
+
     String name = _controllerName.text;
     String email = _controllerEmail.text;
     String password = _controllerPassword.text;
 
     if (name.isNotEmpty) {
       if (email.isNotEmpty && email.contains("@")) {
-        if (password.isNotEmpty) {
+        if (password.isNotEmpty && password.length > 6) {
+
           setState(() {
             _errorMessage = "";
           });
-          _registerUser();
+
+          UserData user = UserData();
+          user.name = name;
+          user.email = email;
+          user.password = password;
+
+          _registerUser(user);
+
         } else {
           setState(() {
-            _errorMessage = "Preencha a Senha!";
+            _errorMessage = "Insira uma senha com mais de 6 caracteres!";
           });
         }
       } else {
@@ -43,11 +56,31 @@ class _RegisterState extends State<Register> {
         _errorMessage = "Preencha o Nome";
       });
     }
+
   }
 
-  _registerUser(){
+  _registerUser(UserData user){
 
+    FirebaseAuth auth = FirebaseAuth.instance;
 
+    auth.createUserWithEmailAndPassword(
+      email: user.email,
+      password: user.password
+    ).then((firebaseUser){
+
+      // Salvar alguns dados do usuário
+      Firestore db = Firestore.instance;
+      db.collection("usuarios")
+          .document(firebaseUser.user.uid)
+          .setData(user.toMap());
+
+      CommonMethods.goToHomeWithReplacement(context);
+
+    }).catchError((error){
+      setState(() {
+        _errorMessage = "Erro ao cadastrar usuário!";
+      });
+    });
 
   }
 
@@ -150,7 +183,7 @@ class _RegisterState extends State<Register> {
                       fontSize: 20,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
