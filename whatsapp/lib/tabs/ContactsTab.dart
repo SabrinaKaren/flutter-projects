@@ -3,7 +3,9 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:whatsapp/data/ConversationData.dart';
+import 'package:whatsapp/data/UserData.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ContactsTab extends StatefulWidget {
   @override
@@ -12,65 +14,94 @@ class ContactsTab extends StatefulWidget {
 
 class _ContactsTabState extends State<ContactsTab> {
 
-  List<ConversationData> _contactsList = [
-    ConversationData(
-        "Rodrigo",
-        "Branqueluxa",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2Frod.png?alt=media&token=ba153718-09af-4d61-8e3e-d199d263c4ab"
-    ),
-    ConversationData(
-        "Desenvolvimento CERCRED",
-        "Atualiza o homologação pfv",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2Fcercred.png?alt=media&token=fa19c591-7dd2-4781-a09d-5b8acbd18f70"
-    ),
-    ConversationData(
-        "Vet Vale",
-        "Como está o rapaizinho?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2FvetVale.png?alt=media&token=bcdb8488-030d-457c-9fe1-88984ac2366a"
-    ),
-    ConversationData(
-        "Tri cats",
-        "Estamos levando pão de queijo",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2FtriCats.png?alt=media&token=ee3d0644-783f-47a3-9ea3-3cc03422e3e8"
-    ),
-    ConversationData(
-        "Joyce",
-        "Aeeeeee JoJo voltou para casa",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2Fjoyce.png?alt=media&token=f248c977-08e8-4948-b773-faa89708751b"
-    )
-  ];
+  String _userId;
+  String _userEmail;
+
+  Future<List<UserData>> _getContacts() async {
+    List<UserData> listToReturn = List();
+
+    Firestore db = Firestore.instance;
+    QuerySnapshot query = await db.collection("usuarios").getDocuments();
+
+    for (DocumentSnapshot item in query.documents) {
+      if (item.data["email"] != _userEmail){
+
+        UserData user = UserData();
+        user.name = item.data["nome"];
+        user.email = item.data["email"];
+        user.imageUrl = item.data["urlImagem"];
+
+        listToReturn.add(user);
+
+      }
+    }
+
+    return listToReturn;
+  }
+
+  _getUserData() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser user = await auth.currentUser();
+    _userId = user.uid;
+    _userEmail = user.email;
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    return ListView.builder(
-      itemCount: _contactsList.length,
-      itemBuilder: (context, index){
+    return FutureBuilder<List<UserData>>(
+      future: _getContacts(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return Center(
+              child: Column(
+                children: <Widget>[
+                  Text("Carregando contatos"),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
+            break;
+          case ConnectionState.waiting:
+            return Container();
+            break;
+          case ConnectionState.active:
+          case ConnectionState.done:
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
 
-        ConversationData item = _contactsList[index];
+                UserData item = snapshot.data[index];
 
-        return ListTile(
+                return ListTile(
+                  onTap: (){
+                    Navigator.pushNamed(context, "/msg", arguments: item);
+                  },
+                  contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  leading: CircleAvatar(
+                    maxRadius: 30,
+                    backgroundColor: Colors.grey,
+                    backgroundImage: item.imageUrl != null ? NetworkImage(item.imageUrl) : null
+                  ),
+                  title: Text(
+                    item.name,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                );
 
-          contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-
-          // foto
-          leading: CircleAvatar(
-            maxRadius: 30,
-            backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage(item.photoPath),
-          ),
-
-          // nome da pessoa
-          title: Text(
-            item.name,
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16
-            ),
-          ),
-
-        );
-
+              },
+            );
+            break;
+        }
       },
     );
 

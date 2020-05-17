@@ -6,12 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/HomePage.dart';
 import 'package:whatsapp/LoginPage.dart';
+import 'package:whatsapp/MessagesPage.dart';
 import 'package:whatsapp/RegisterPage.dart';
 import 'package:whatsapp/SettingsPage.dart';
 
 class CommonMethods{
 
   static Route<dynamic> generateRoute(RouteSettings settings){
+
+    final parameters = settings.arguments;
 
     switch( settings.name ){
       case "/" :
@@ -33,6 +36,10 @@ class CommonMethods{
       case "/config" :
         return MaterialPageRoute(
             builder: (_) => SettingsPage()
+        );
+      case "/msg" :
+        return MaterialPageRoute(
+            builder: (_) => MessagesPage(parameters)
         );
       default:
         _errorRoute();

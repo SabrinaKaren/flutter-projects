@@ -7,8 +7,15 @@ class UserData{
   String _name;
   String _email;
   String _password;
+  String _imageUrl;
 
   UserData();
+
+  String get imageUrl => _imageUrl;
+
+  set imageUrl(String value) {
+    _imageUrl = value;
+  }
 
   Map<String, dynamic> toMap(){
 
