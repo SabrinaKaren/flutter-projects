@@ -2,7 +2,9 @@
   Sabrina Karen
 */
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/LoginPage.dart';
 import 'package:whatsapp/Tabs/ContactsTab.dart';
 import 'package:whatsapp/tabs/ConversationsTab.dart';
 
@@ -14,6 +16,34 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
 
   TabController _tabController;
+  List<String> menuItems = ["Configurações", "Deslogar"];
+
+  _choiceOfMenu(String chosenItem){
+
+    switch(chosenItem){
+      case "Configurações":
+        Navigator.pushNamed(context, "/config");
+        break;
+      case "Deslogar":
+        _logoutUser();
+        break;
+    }
+
+  }
+
+  _logoutUser() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await auth.signOut();
+
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Login()
+        )
+    );
+
+  }
 
   @override
   void initState() {
@@ -50,6 +80,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             Tab(text: "Contatos",),
           ],
         ),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: _choiceOfMenu,
+            itemBuilder: (context){
+              return menuItems.map((String item){
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,

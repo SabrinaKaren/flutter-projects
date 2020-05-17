@@ -74,7 +74,7 @@ class _RegisterState extends State<Register> {
           .document(firebaseUser.user.uid)
           .setData(user.toMap());
 
-      CommonMethods.goToHomeWithReplacement(context);
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (_)=>false);
 
     }).catchError((error){
       setState(() {
