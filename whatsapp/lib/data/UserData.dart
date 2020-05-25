@@ -4,6 +4,7 @@
 
 class UserData{
 
+  String _idUsuario;
   String _name;
   String _email;
   String _password;
@@ -12,6 +13,12 @@ class UserData{
   UserData();
 
   String get imageUrl => _imageUrl;
+
+  String get idUsuario => _idUsuario;
+
+  set idUsuario(String value) {
+    _idUsuario = value;
+  }
 
   set imageUrl(String value) {
     _imageUrl = value;

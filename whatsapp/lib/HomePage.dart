@@ -17,6 +17,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   TabController _tabController;
   List<String> menuItems = ["Configurações", "Deslogar"];
+  String _userEmail = "";
+
+  Future _getUserData() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser activeUser = await auth.currentUser();
+
+    setState(() {
+      _userEmail = activeUser.email;
+    });
+
+  }
 
   _choiceOfMenu(String chosenItem){
 
@@ -45,9 +57,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   }
 
+  Future _treatmentIfUserIsLogged() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    FirebaseUser activeUser = await auth.currentUser();
+
+    if(activeUser == null){
+      Navigator.pushReplacementNamed(context, "/login");
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
+    _treatmentIfUserIsLogged();
+    _getUserData();
     _tabController = TabController(
         length: 2,
         vsync: this,

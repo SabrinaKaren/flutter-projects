@@ -2,8 +2,11 @@
   Sabrina Karen
 */
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/data/MessageData.dart';
 import 'package:whatsapp/data/UserData.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -20,6 +23,8 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
 
   TextEditingController _controllerMsg = TextEditingController();
+  String _userId;
+  String _userReceiverId;
   List<String> _msgsList = [
     "Olá meu amigo, tudo bem?",
     "Tudo ótimo!!! e contigo?",
@@ -36,12 +41,53 @@ class _MessagesPageState extends State<MessagesPage> {
     "Que legal!!"
   ];
 
+  _getUserData() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser user = await auth.currentUser();
+    _userId = user.uid;
+    _userReceiverId = widget.contact.idUsuario;
+
+  }
+
   _sendMessage(){
+
+    String messageText = _controllerMsg.text;
+    if(messageText.isNotEmpty){
+
+      MessageData messageObject = MessageData();
+      messageObject.idUsuario = _userId;
+      messageObject.mensagem  = messageText;
+      messageObject.urlImagem = "";
+      messageObject.tipo = "texto";
+
+      _saveMessage(_userId, _userReceiverId, messageObject);
+
+    }
+
+  }
+
+  _saveMessage(String senderId, String receiverId, MessageData msg) async {
+
+    Firestore db = Firestore.instance;
+
+    await db.collection("mensagens")
+        .document(senderId)
+        .collection(receiverId)
+        .add(msg.toMap());
+
+    _controllerMsg.clear();
 
   }
 
   _sendPhoto(){
 
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
   }
 
   @override
@@ -126,7 +172,19 @@ class _MessagesPageState extends State<MessagesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.contact.name),
+        title: Row(
+          children: <Widget>[
+            CircleAvatar(
+                maxRadius: 20,
+                backgroundColor: Colors.grey,
+                backgroundImage: widget.contact.imageUrl != null ? NetworkImage(widget.contact.imageUrl) : null
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Text(widget.contact.name),
+            )
+          ],
+        ),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
