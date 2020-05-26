@@ -18,6 +18,7 @@ class _ContactsTabState extends State<ContactsTab> {
   String _userEmail;
 
   Future<List<UserData>> _getContacts() async {
+
     List<UserData> listToReturn = List();
 
     Firestore db = Firestore.instance;
@@ -38,6 +39,7 @@ class _ContactsTabState extends State<ContactsTab> {
     }
 
     return listToReturn;
+
   }
 
   _getUserData() async {
