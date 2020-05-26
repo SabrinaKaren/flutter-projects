@@ -62,7 +62,11 @@ class _MessagesPageState extends State<MessagesPage> {
       messageObject.urlImagem = "";
       messageObject.tipo = "texto";
 
+      // salvando msg para o remetente
       _saveMessage(_userId, _userReceiverId, messageObject);
+
+      // salvando msg para o destinatário
+      _saveMessage(_userReceiverId, _userId, messageObject);
 
     }
 
@@ -91,7 +95,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    
+
     var messageBox = Container(
       padding: EdgeInsets.all(8),
       child: Row(
@@ -105,26 +109,26 @@ class _MessagesPageState extends State<MessagesPage> {
                 keyboardType: TextInputType.text,
                 style: TextStyle(fontSize: 20),
                 decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(32, 8, 32, 8),
-                    hintText: "Digite uma mensagem...",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    ),
+                  contentPadding: EdgeInsets.fromLTRB(32, 8, 32, 8),
+                  hintText: "Digite uma mensagem...",
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
                   prefixIcon: IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: _sendPhoto
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: _sendPhoto
                   ),
                 ),
               ),
             ),
           ),
           FloatingActionButton(
-            backgroundColor: Color(0xff075E54),
-            child: Icon(Icons.send, color: Colors.white,),
-            mini: true,
-            onPressed: _sendMessage
+              backgroundColor: Color(0xff075E54),
+              child: Icon(Icons.send, color: Colors.white,),
+              mini: true,
+              onPressed: _sendMessage
           ),
         ],
       ),
@@ -229,7 +233,7 @@ class _MessagesPageState extends State<MessagesPage> {
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                 ),
                 child: Text(
-                    _msgsList[index],
+                  _msgsList[index],
                   style: TextStyle(
                     fontSize: 14,
                   ),
@@ -262,20 +266,20 @@ class _MessagesPageState extends State<MessagesPage> {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: AssetImage("images/bg.png"),
+            image: AssetImage("images/bg.png"),
             fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              children: <Widget>[
-                stream,
-                messageBox,
-              ],
-            ),
-          )
+            child: Container(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                children: <Widget>[
+                  stream,
+                  messageBox,
+                ],
+              ),
+            )
         ),
       ),
     );
