@@ -8,16 +8,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/data/MessageData.dart';
 import 'package:whatsapp/data/UserData.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class MessagesPage extends StatefulWidget {
-
   UserData contact;
-
   MessagesPage(this.contact);
 
   @override
   _MessagesPageState createState() => _MessagesPageState();
-
 }
 
 class _MessagesPageState extends State<MessagesPage> {
@@ -26,21 +26,8 @@ class _MessagesPageState extends State<MessagesPage> {
   String _userId;
   String _userReceiverId;
   Firestore db = Firestore.instance;
-  List<String> _msgsList = [
-    "Olá meu amigo, tudo bem?",
-    "Tudo ótimo!!! e contigo?",
-    "Estou muito bem!! queria ver uma coisa contigo, você vai na corrida de sábado?",
-    "Não sei ainda :(",
-    "Pq se você fosse, queria ver se posso ir com você...",
-    "Posso te confirma no sábado? vou ver isso",
-    "Opa! tranquilo",
-    "Excelente!!",
-    "Estou animado para essa corrida, não vejo a hora de chegar! ;) ",
-    "Vai estar bem legal!! muita gente",
-    "vai sim!",
-    "Lembra do carro que tinha te falado",
-    "Que legal!!"
-  ];
+  File selectedImage;
+  bool _uploadingImage = false;
 
   _getUserData() async {
 
@@ -83,7 +70,60 @@ class _MessagesPageState extends State<MessagesPage> {
 
   }
 
-  _sendPhoto(){
+  _sendPhoto() async {
+
+    File selectedImage;
+    selectedImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+    _uploadingImage = true;
+
+    String imageName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    StorageReference rootFolder = storage.ref();
+    StorageReference archive = rootFolder
+        .child("mensagens")
+        .child(_userId)
+        .child(imageName + ".jpg");
+
+    // uploading da imagem
+    StorageUploadTask task = archive.putFile(selectedImage);
+
+    // controlando progresso do upload
+    task.events.listen((StorageTaskEvent storageEvent){
+      if (storageEvent.type == StorageTaskEventType.progress){
+        setState(() {
+          _uploadingImage = true;
+        });
+      } else if (storageEvent.type == StorageTaskEventType.success){
+        setState(() {
+          _uploadingImage = false;
+        });
+      }
+    });
+
+    // recuperando url da imagem
+    task.onComplete.then((StorageTaskSnapshot snapshot){
+      _getImageUrl(snapshot);
+    });
+
+  }
+
+  Future _getImageUrl(StorageTaskSnapshot snapshot) async {
+
+    String url = await snapshot.ref.getDownloadURL();
+
+    MessageData messageObject = MessageData();
+    messageObject.idUsuario = _userId;
+    messageObject.mensagem  = "";
+    messageObject.urlImagem = url;
+    messageObject.tipo = "imagem";
+
+    // salvando msg para o remetente
+    _saveMessage(_userId, _userReceiverId, messageObject);
+
+    // salvando msg para o destinatário
+    _saveMessage(_userReceiverId, _userId, messageObject);
 
   }
 
@@ -116,10 +156,10 @@ class _MessagesPageState extends State<MessagesPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(32),
                   ),
-                  prefixIcon: IconButton(
-                      icon: Icon(Icons.camera_alt),
-                      onPressed: _sendPhoto
-                  ),
+                  prefixIcon:
+                    _uploadingImage
+                        ? CircularProgressIndicator()
+                        : IconButton(icon: Icon(Icons.camera_alt), onPressed: _sendPhoto)
                 ),
               ),
             ),
@@ -140,6 +180,7 @@ class _MessagesPageState extends State<MessagesPage> {
           .document(_userId)
           .collection(_userReceiverId)
           .snapshots(),
+      // ignore: missing_return
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -191,10 +232,10 @@ class _MessagesPageState extends State<MessagesPage> {
                                 color: cor,
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(8))),
-                            child: Text(
-                              item["mensagem"],
-                              style: TextStyle(fontSize: 18),
-                            ),
+                            child:
+                            item["tipo"] == "texto"
+                              ? Text(item["mensagem"], style: TextStyle(fontSize: 18))
+                              : Image.network(item["urlImagem"]),
                           ),
                         ),
                       );
@@ -205,45 +246,6 @@ class _MessagesPageState extends State<MessagesPage> {
             break;
         }
       },
-    );
-
-    var listView = Expanded(
-      child: ListView.builder(
-        itemCount: _msgsList.length,
-        itemBuilder: (context, index){
-
-          double containerWidth = MediaQuery.of(context).size.width * 0.8;
-
-          Alignment alignment = Alignment.centerRight;
-          Color boxColor = Color(0xffd2ffa5);
-          if(index % 2 == 0){ //par
-            alignment = Alignment.centerLeft;
-            boxColor = Colors.white;
-          }
-
-          return Align(
-            alignment: alignment,
-            child: Padding(
-              padding: EdgeInsets.all(6),
-              child: Container(
-                width: containerWidth,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: boxColor,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                child: Text(
-                  _msgsList[index],
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-          );
-
-        },
-      ),
     );
 
     return Scaffold(
