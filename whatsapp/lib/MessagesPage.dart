@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/data/ConversationData.dart';
 import 'package:whatsapp/data/MessageData.dart';
 import 'package:whatsapp/data/UserData.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -55,7 +56,34 @@ class _MessagesPageState extends State<MessagesPage> {
       // salvando msg para o destinatário
       _saveMessage(_userReceiverId, _userId, messageObject);
 
+      // salvando a conversa
+      _saveConversation(messageObject);
+
     }
+
+  }
+
+  _saveConversation(MessageData msg){
+
+    // salvando conversa remetente
+    ConversationData conversationSender = ConversationData();
+    conversationSender.senderId = _userId;
+    conversationSender.receiverId = _userReceiverId;
+    conversationSender.message = msg.mensagem;
+    conversationSender.name = widget.contact.name;
+    conversationSender.photoPath = widget.contact.imageUrl;
+    conversationSender.messageType = msg.tipo;
+    conversationSender.save();
+
+    //Salvar conversa destinatario
+    ConversationData conversationReceiver = ConversationData();
+    conversationReceiver.senderId = _userReceiverId;
+    conversationReceiver.receiverId = _userId;
+    conversationReceiver.message = msg.mensagem;
+    conversationReceiver.name = widget.contact.name;
+    conversationReceiver.photoPath = widget.contact.imageUrl;
+    conversationReceiver.messageType = msg.tipo;
+    conversationReceiver.save();
 
   }
 
