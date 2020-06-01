@@ -56,6 +56,7 @@ class _MessagesPageState extends State<MessagesPage> {
       messageObject.mensagem  = messageText;
       messageObject.urlImagem = "";
       messageObject.tipo = "texto";
+      messageObject.data = Timestamp.now().toString();
 
       // salvando msg para o remetente
       _saveMessage(_userId, _userReceiverId, messageObject);
@@ -153,6 +154,7 @@ class _MessagesPageState extends State<MessagesPage> {
     messageObject.mensagem  = "";
     messageObject.urlImagem = url;
     messageObject.tipo = "imagem";
+    messageObject.data = Timestamp.now().toString();
 
     // salvando msg para o remetente
     _saveMessage(_userId, _userReceiverId, messageObject);
@@ -168,6 +170,7 @@ class _MessagesPageState extends State<MessagesPage> {
         .collection("mensagens")
         .document(_userId)
         .collection(_userReceiverId)
+        .orderBy("data", descending: false)
         .snapshots();
 
     stream.listen((dados){
