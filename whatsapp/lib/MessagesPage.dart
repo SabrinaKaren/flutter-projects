@@ -2,6 +2,8 @@
   Sabrina Karen
 */
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,12 +32,17 @@ class _MessagesPageState extends State<MessagesPage> {
   File selectedImage;
   bool _uploadingImage = false;
 
+  final _controller = StreamController<QuerySnapshot>.broadcast();
+  ScrollController _scrollController = ScrollController();
+
   _getUserData() async {
 
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser user = await auth.currentUser();
     _userId = user.uid;
     _userReceiverId = widget.contact.idUsuario;
+
+    _addListenerMessages();
 
   }
 
@@ -155,6 +162,23 @@ class _MessagesPageState extends State<MessagesPage> {
 
   }
 
+  Stream<QuerySnapshot> _addListenerMessages() {
+
+    final stream = db
+        .collection("mensagens")
+        .document(_userId)
+        .collection(_userReceiverId)
+        .snapshots();
+
+    stream.listen((dados){
+      _controller.add(dados);
+      Timer(Duration(seconds: 1), (){
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      } );
+    });
+
+  }
+
   @override
   void initState() {
     super.initState();
@@ -203,11 +227,7 @@ class _MessagesPageState extends State<MessagesPage> {
     );
 
     var stream = StreamBuilder(
-      stream: db
-          .collection("mensagens")
-          .document(_userId)
-          .collection(_userReceiverId)
-          .snapshots(),
+      stream: _controller.stream,
       // ignore: missing_return
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -234,6 +254,7 @@ class _MessagesPageState extends State<MessagesPage> {
             } else {
               return Expanded(
                 child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: querySnapshot.documents.length,
                     itemBuilder: (context, indice) {
 
