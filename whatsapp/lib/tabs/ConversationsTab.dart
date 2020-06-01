@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/data/ConversationData.dart';
+import 'package:whatsapp/data/UserData.dart';
 
 class ConversationsTab extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _ConversationsTabState extends State<ConversationsTab> {
         "https://firebasestorage.googleapis.com/v0/b/whatsapp-c376e.appspot.com/o/perfil%2Frod.png?alt=media&token=ba153718-09af-4d61-8e3e-d199d263c4ab";
 
     _conversationList.add(newConversation);
-    
+
   }
 
   Stream<QuerySnapshot> _addListenerConversations() {
@@ -63,7 +64,14 @@ class _ConversationsTabState extends State<ConversationsTab> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _controller.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     return StreamBuilder<QuerySnapshot>(
       stream: _controller.stream,
       // ignore: missing_return
@@ -106,8 +114,17 @@ class _ConversationsTabState extends State<ConversationsTab> {
                     String tipo = item["tipoMensagem"];
                     String mensagem = item["mensagem"];
                     String nome = item["nome"];
+                    String idDestinatario       = item["idDestinatario"];
+
+                    UserData user = UserData();
+                    user.name = nome;
+                    user.imageUrl = urlImagem;
+                    user.idUsuario = idDestinatario;
 
                     return ListTile(
+                      onTap: (){
+                        Navigator.pushNamed(context, "/msg", arguments: user);
+                      },
                       contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                       leading: CircleAvatar(
                         maxRadius: 30,
@@ -128,5 +145,7 @@ class _ConversationsTabState extends State<ConversationsTab> {
         }
       },
     );
+
   }
+
 }
