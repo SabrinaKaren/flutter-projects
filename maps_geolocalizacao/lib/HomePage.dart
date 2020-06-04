@@ -15,8 +15,13 @@ class _HomePageState extends State<HomePage> {
 
   Completer<GoogleMapController> _controller = Completer();
 
+  _onMapCreated(GoogleMapController googleMapController){
+    _controller.complete(googleMapController);
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(title: Text("Mapas e geolocalização"),),
       body: Container(
@@ -26,12 +31,11 @@ class _HomePageState extends State<HomePage> {
               target: LatLng(-23.562436, -46.655005),
               zoom: 16
           ),
-          onMapCreated: (GoogleMapController controller){
-            _controller.complete(controller);
-          },
+          onMapCreated: _onMapCreated,
         ),
       ),
     );
+
   }
 
 }
