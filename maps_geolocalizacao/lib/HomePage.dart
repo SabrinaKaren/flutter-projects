@@ -15,6 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
+  Set<Polygon> _polygons  = {};
 
   _onMapCreated(GoogleMapController googleMapController){
     _controller.complete(googleMapController);
@@ -69,8 +70,8 @@ class _HomePageState extends State<HomePage> {
         }
     );
 
-    localMarkers.add( marcadorShopping );
-    localMarkers.add( marcadorCartorio );
+    localMarkers.add(marcadorShopping);
+    localMarkers.add(marcadorCartorio);
 
     setState(() {
       _markers = localMarkers;
@@ -78,10 +79,59 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  _loadPolygons() async {
+
+    Set<Polygon> polygonsList = {};
+
+    Polygon polygon1 = Polygon(
+        polygonId: PolygonId("polygon1"),
+        fillColor: Colors.green,
+        strokeColor: Colors.red,
+        strokeWidth: 20,
+        points: [
+          LatLng(-23.561816, -46.652044),
+          LatLng(-23.563625, -46.653642),
+          LatLng(-23.564786, -46.652226),
+          LatLng(-23.563085, -46.650531),
+        ],
+        consumeTapEvents: true,
+        onTap: (){
+          print("clicado na área");
+        },
+        zIndex: 1
+    );
+
+    Polygon polygon2 = Polygon(
+        polygonId: PolygonId("polygon2"),
+        fillColor: Colors.purple,
+        strokeColor: Colors.orange,
+        strokeWidth: 20,
+        points: [
+          LatLng(-23.561629, -46.653031),
+          LatLng(-23.565189, -46.651872),
+          LatLng(-23.562032, -46.650831),
+        ],
+        consumeTapEvents: true,
+        onTap: (){
+          print("clicado na área");
+        },
+        zIndex: 0
+    );
+
+    polygonsList.add(polygon1);
+    polygonsList.add(polygon2);
+
+    setState(() {
+      _polygons = polygonsList;
+    });
+
+  }
+
   @override
   void initState() {
     super.initState();
-    _loadMarkers();
+    //_loadMarkers();
+    _loadPolygons();
   }
 
   @override
@@ -103,6 +153,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onMapCreated: _onMapCreated,
           markers: _markers,
+          polygons: _polygons,
         ),
       ),
     );
