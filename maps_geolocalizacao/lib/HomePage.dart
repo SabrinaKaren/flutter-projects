@@ -20,6 +20,10 @@ class _HomePageState extends State<HomePage> {
       zoom: 19
   );
 
+  _onMapCreated(GoogleMapController googleMapController){
+    _controller.complete(googleMapController);
+  }
+
   _getCurrentLocation() async {
 
     Position position = await Geolocator().getCurrentPosition(
@@ -77,10 +81,6 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-  _onMapCreated(GoogleMapController googleMapController){
-    _controller.complete(googleMapController);
-  }
-
   _moveCamera() async {
 
     GoogleMapController googleMapController = await _controller.future;
@@ -92,10 +92,67 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  _getLocationToAddress() async {
+
+    List<Placemark> addressList = await Geolocator()
+        .placemarkFromAddress("Av. Paulista, 1372");
+
+    if(addressList != null && addressList.length > 0){
+
+      Placemark address = addressList[0];
+      String result;
+
+      result  = "\n administrativeArea " + address.administrativeArea ;
+      result += "\n subAdministrativeArea " + address.subAdministrativeArea ;
+      result += "\n locality " + address.locality ;
+      result += "\n subLocality " + address.subLocality ;
+      result += "\n thoroughfare " + address.thoroughfare ;
+      result += "\n subThoroughfare " + address.subThoroughfare ;
+      result += "\n postalCode " + address.postalCode ;
+      result += "\n country " + address.country ;
+      result += "\n isoCountryCode " + address.isoCountryCode ;
+      result += "\n position " + address.position.toString() ;
+
+      print("resultado: " + result);
+
+    }
+
+  }
+
+  _getLocationToLatLong() async {
+
+    List<Placemark> addressList = await Geolocator()
+        .placemarkFromCoordinates(-23.565564, -46.652753);
+
+    if(addressList != null && addressList.length > 0){
+
+      Placemark address = addressList[0];
+      String result;
+
+      result  = "\n administrativeArea " + address.administrativeArea ;
+      result += "\n subAdministrativeArea " + address.subAdministrativeArea ;
+      result += "\n locality " + address.locality ;
+      result += "\n subLocality " + address.subLocality ;
+      result += "\n thoroughfare " + address.thoroughfare ;
+      result += "\n subThoroughfare " + address.subThoroughfare ;
+      result += "\n postalCode " + address.postalCode ;
+      result += "\n country " + address.country ;
+      result += "\n isoCountryCode " + address.isoCountryCode ;
+      result += "\n position " + address.position.toString() ;
+
+      print("resultado: " + result);
+
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
-    _monitoringUserLocation();
+    //_getCurrentLocation();
+    //_monitoringUserLocation();
+    //_getLocationToAddress();
+    _getLocationToLatLong();
   }
 
   @override
