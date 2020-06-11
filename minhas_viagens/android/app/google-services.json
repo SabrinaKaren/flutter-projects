@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "566191578402",
+    "firebase_url": "https://minhas-viagens-279923.firebaseio.com",
+    "project_id": "minhas-viagens-279923",
+    "storage_bucket": "minhas-viagens-279923.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566191578402:android:ac986e27c13abe901ad97b",
+        "android_client_info": {
+          "package_name": "com.sabrinakaren.minhasviagens"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "566191578402-a5o2870n0rg10n5mcmfim62irmrk1ji4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOiGF3yra0uatH6w0k3GS8mGQAPHFsGlY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566191578402-a5o2870n0rg10n5mcmfim62irmrk1ji4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

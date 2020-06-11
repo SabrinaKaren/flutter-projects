@@ -1,6 +1,7 @@
 /*
   Sabrina Karen
  */
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
@@ -19,12 +20,13 @@ class _MapPageState extends State<MapPage> {
       target: LatLng(-19.919185, -43.938747),
       zoom: 18
   );
+  Firestore _db = Firestore.instance;
 
   _onMapCreated(GoogleMapController controller){
     _controller.complete(controller);
   }
 
-  _showMarker(LatLng latLng) async {
+  _addMarker(LatLng latLng) async {
 
     List<Placemark> addressList = await Geolocator()
         .placemarkFromCoordinates(latLng.latitude, latLng.longitude);
@@ -43,7 +45,17 @@ class _MapPageState extends State<MapPage> {
       );
 
       setState(() {
+
         _markers.add(marker);
+
+        // salvar no firestore
+        Map<String, dynamic> trip = Map();
+        trip["titulo"] = street;
+        trip["latitude"] = latLng.latitude;
+        trip["longitude"] = latLng.longitude;
+
+        _db.collection("viagens").add(trip);
+
       });
 
     }
@@ -98,7 +110,7 @@ class _MapPageState extends State<MapPage> {
           mapType: MapType.normal,
           initialCameraPosition: _cameraPosition,
           onMapCreated: _onMapCreated,
-          onLongPress: _showMarker,
+          onLongPress: _addMarker,
         ),
       ),
     );
