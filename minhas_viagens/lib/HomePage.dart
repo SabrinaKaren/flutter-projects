@@ -2,6 +2,7 @@
   Sabrina Karen
  */
 import 'package:flutter/material.dart';
+import 'package:minhasviagens/MapPage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,6 +29,13 @@ class _HomePageState extends State<HomePage> {
 
   _addPlace(){
 
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => MapPage(),
+        )
+    );
+
   }
 
   @override
@@ -36,7 +44,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Minhas viagens"),
-        backgroundColor: Color(0xff0066cc),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
