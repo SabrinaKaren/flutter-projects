@@ -1,6 +1,8 @@
 /*
   Sabrina Karen
  */
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:minhasviagens/MapPage.dart';
@@ -12,20 +14,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List _placesList = [
-    "Cristo Redentor",
-    "Grande Muralha da China",
-    "Taj Mahal",
-    "Machu Picchu",
-    "Coliseu"
-  ];
+  final _controller = StreamController<QuerySnapshot>.broadcast();
+  Firestore _db = Firestore.instance;
 
-  _openMap(){
-
+  _openMap(String tripId){
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => MapPage(tripId: tripId,)
+        )
+    );
   }
 
-  _deletePlace(){
-
+  _deletePlace(String tripId){
+    _db.collection("viagens")
+        .document(tripId)
+        .delete();
   }
 
   _addPlace(){
@@ -37,6 +41,22 @@ class _HomePageState extends State<HomePage> {
         )
     );
 
+  }
+
+  _addListener() async {
+
+    final stream = _db.collection("viagens").snapshots();
+
+    stream.listen((data){
+      _controller.add(data);
+    });
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _addListener();
   }
 
   @override
@@ -56,7 +76,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: null,
+        stream: _controller.stream,
         // ignore: missing_return
         builder: (context, snapshot){
 
@@ -67,28 +87,32 @@ class _HomePageState extends State<HomePage> {
             case ConnectionState.active:
             case ConnectionState.done:
 
+              QuerySnapshot querySnapshot = snapshot.data;
+              List<DocumentSnapshot> trips = querySnapshot.documents.toList();
+
               return Column(
                 children: <Widget>[
                   Expanded(
                     child: ListView.builder(
-                      itemCount: _placesList.length,
+                      itemCount: trips.length,
                       itemBuilder: (context, index){
 
-                        String title = _placesList[index];
+                        DocumentSnapshot item = trips[index];
+                        String tripId = item.documentID;
 
                         return GestureDetector(
                           onTap: (){
-                            _openMap();
+                            _openMap(tripId);
                           },
                           child: Card(
                             child: ListTile(
-                              title: Text(title),
+                              title: Text(item["titulo"]),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   GestureDetector(
                                     onTap: (){
-                                      _deletePlace();
+                                      _deletePlace(tripId);
                                     },
                                     child: Padding(
                                       padding: EdgeInsets.all(8),

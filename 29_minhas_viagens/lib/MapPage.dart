@@ -8,8 +8,13 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 class MapPage extends StatefulWidget {
+
+  String tripId;
+  MapPage({this.tripId});
+
   @override
   _MapPageState createState() => _MapPageState();
+
 }
 
 class _MapPageState extends State<MapPage> {
@@ -91,10 +96,52 @@ class _MapPageState extends State<MapPage> {
 
   }
 
+  _getTripById(String tripId) async {
+
+    if(tripId != null){
+
+      DocumentSnapshot documentSnapshot = await _db
+          .collection("viagens")
+          .document(tripId)
+          .get();
+
+      var data = documentSnapshot.data;
+
+      String title = data["titulo"];
+      LatLng latLng = LatLng(
+          data["latitude"],
+          data["longitude"]
+      );
+
+      setState(() {
+
+        Marker marker = Marker(
+            markerId: MarkerId("marcador-${latLng.latitude}-${latLng.longitude}"),
+            position: latLng,
+            infoWindow: InfoWindow(
+                title: title
+            )
+        );
+
+        _markers.add(marker);
+        _cameraPosition = CameraPosition(
+            target: latLng,
+            zoom: 18
+        );
+        _moveCamera();
+
+      });
+
+    }else{
+      _monitoringUserLocation();
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
-    _monitoringUserLocation();
+    _getTripById(widget.tripId);
   }
 
   @override
