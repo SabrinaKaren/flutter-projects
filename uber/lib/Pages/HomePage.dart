@@ -91,12 +91,7 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: (){
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterPage()
-                          )
-                      );
+                      Navigator.pushNamed(context, "/cadastro");
                     },
                   ),
                 ),
