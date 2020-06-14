@@ -2,6 +2,7 @@
   Sabrina Karen
  */
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uber/Data/UserData.dart';
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerPassword = TextEditingController();
   String _errorMsg = "";
+  bool _loading = false;
 
   _validateFields(){
 
@@ -49,6 +51,10 @@ class _HomePageState extends State<HomePage> {
 
   _loginUser(UserData user){
 
+    setState(() {
+      _loading = true;
+    });
+
     FirebaseAuth auth = FirebaseAuth.instance;
 
     auth.signInWithEmailAndPassword(
@@ -56,12 +62,56 @@ class _HomePageState extends State<HomePage> {
         password: user.password
     ).then((firebaseUser){
 
-      Navigator.pushReplacementNamed(context, "/passageiro");
+      _redirectsByUserType(firebaseUser.user.uid);
 
     }).catchError((error){
       _errorMsg = "Erro ao autenticar usuário, verifique e-mail e senha e tente novamente!";
     });
 
+  }
+
+  _redirectsByUserType(String userId) async {
+
+    Firestore db = Firestore.instance;
+
+    DocumentSnapshot snapshot = await db.collection("usuarios")
+        .document(userId)
+        .get();
+
+    Map<String, dynamic> data = snapshot.data;
+    String userType = data["tipoUsuario"];
+
+    setState(() {
+      _loading = false;
+    });
+
+    switch(userType){
+      case "motorista" :
+        Navigator.pushReplacementNamed(context, "/motorista");
+        break;
+      case "passageiro" :
+        Navigator.pushReplacementNamed(context, "/passageiro");
+        break;
+    }
+
+  }
+
+  _checkLoggedUser() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    FirebaseUser loggedUser = await auth.currentUser();
+    if(loggedUser != null){
+      String userId = loggedUser.uid;
+      _redirectsByUserType(userId);
+    }
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoggedUser();
   }
 
   @override
@@ -144,6 +194,9 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
+                _loading
+                    ? Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                    : Container(),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
