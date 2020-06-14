@@ -2,7 +2,9 @@
   Sabrina Karen
  */
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uber/Data/UserData.dart';
 import 'package:uber/Pages/RegisterPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,11 +14,58 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerPassword = TextEditingController();
+  String _errorMsg = "";
+
+  _validateFields(){
+
+    String email = _controllerEmail.text;
+    String password = _controllerPassword.text;
+
+    if(email.isNotEmpty && email.contains("@")){
+
+      if(password.isNotEmpty && password.length > 6){
+
+        UserData user = UserData();
+        user.email = email;
+        user.password = password;
+
+        _loginUser(user);
+
+      }else{
+        setState(() {
+          _errorMsg = "Preencha a senha! digite mais de 6 caracteres";
+        });
+      }
+
+    }else{
+      setState(() {
+        _errorMsg = "Preencha o E-mail válido";
+      });
+    }
+
+  }
+
+  _loginUser(UserData user){
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    auth.signInWithEmailAndPassword(
+        email: user.email,
+        password: user.password
+    ).then((firebaseUser){
+
+      Navigator.pushReplacementNamed(context, "/passageiro");
+
+    }).catchError((error){
+      _errorMsg = "Erro ao autenticar usuário, verifique e-mail e senha e tente novamente!";
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    TextEditingController _controllerEmail = TextEditingController();
-    TextEditingController _controllerPassword = TextEditingController();
 
     return Scaffold(
       body: Container(
@@ -80,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xff1ebbd8),
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       onPressed: (){
-
+                        _validateFields();
                       }
                   ),
                 ),
