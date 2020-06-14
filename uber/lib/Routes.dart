@@ -3,7 +3,9 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:uber/Pages/DriverPage.dart';
 import 'package:uber/Pages/HomePage.dart';
+import 'package:uber/Pages/PassengerPage.dart';
 import 'package:uber/Pages/RegisterPage.dart';
 
 class Routes {
@@ -18,6 +20,14 @@ class Routes {
       case "/cadastro" :
         return MaterialPageRoute(
             builder: (_) => RegisterPage()
+        );
+      case "/motorista" :
+        return MaterialPageRoute(
+            builder: (_) => DriverPage()
+        );
+      case "/passageiro" :
+        return MaterialPageRoute(
+            builder: (_) => PassengerPage()
         );
       default:
         _errorRoute();

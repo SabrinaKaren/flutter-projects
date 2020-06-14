@@ -2,7 +2,10 @@
   Sabrina Karen
  */
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uber/Data/UserData.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -15,6 +18,82 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerPassword = TextEditingController();
   bool _passengerUserType = false;
+  String _errorMsg = "";
+
+  _validateFields(){
+
+    String name = _controllerName.text;
+    String email = _controllerEmail.text;
+    String password = _controllerPassword.text;
+
+    if(name.isNotEmpty){
+
+      if(email.isNotEmpty && email.contains("@")){
+
+        if(password.isNotEmpty && password.length > 6){
+
+          UserData user = UserData();
+          user.name = name;
+          user.email = email;
+          user.password = password;
+          user.userType = user.checkUserType(_passengerUserType);
+
+          _registerUser(user);
+
+        }else{
+          setState(() {
+            _errorMsg = "Preencha a senha! digite mais de 6 caracteres";
+          });
+        }
+
+      }else{
+        setState(() {
+          _errorMsg = "Preencha o E-mail válido";
+        });
+      }
+
+    }else{
+      setState(() {
+        _errorMsg = "Preencha o Nome";
+      });
+    }
+
+  }
+
+  _registerUser(UserData user){
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    Firestore db = Firestore.instance;
+
+    auth.createUserWithEmailAndPassword(
+        email: user.email,
+        password: user.password
+    ).then((firebaseUser){
+
+      db.collection("usuarios")
+          .document( firebaseUser.user.uid )
+          .setData(user.toMap());
+
+      switch(user.userType){
+        case "motorista" :
+          Navigator.pushNamedAndRemoveUntil(
+              context,
+              "/motorista",
+                  (_) => false
+          );
+          break;
+        case "passageiro" :
+          Navigator.pushNamedAndRemoveUntil(
+              context,
+              "/passageiro",
+                  (_) => false
+          );
+          break;
+      }
+
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       color: Color(0xff1ebbd8),
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       onPressed: (){
-
+                        _validateFields();
                       }
                   ),
                 ),
