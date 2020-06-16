@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PassengerPage extends StatefulWidget {
@@ -20,6 +21,9 @@ class _PassengerPageState extends State<PassengerPage> {
     "Configurações", "Deslogar"
   ];
   Completer<GoogleMapController> _controller = Completer();
+  CameraPosition _cameraPosition = CameraPosition(
+      target: LatLng(-19.931824, -43.935333)
+  );
 
   _logoutUser() async {
 
@@ -43,8 +47,66 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
+  _getLastKnownLocation() async {
+
+    Position position = await Geolocator()
+        .getLastKnownPosition( desiredAccuracy: LocationAccuracy.high );
+
+    setState(() {
+      if( position != null ){
+        _cameraPosition = CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 19
+        );
+
+        _moveCamera(_cameraPosition);
+
+      }
+    });
+
+  }
+
+  _moveCamera(CameraPosition cameraPosition) async {
+
+    GoogleMapController googleMapController = await _controller.future;
+    googleMapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+            cameraPosition
+        )
+    );
+
+  }
+
+  _addListenerOfLocalization(){
+
+    var geolocator = Geolocator();
+    var locationOptions = LocationOptions(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10
+    );
+
+    geolocator.getPositionStream( locationOptions ).listen((Position position){
+
+      _cameraPosition = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 19
+      );
+
+      _moveCamera(_cameraPosition);
+
+    });
+
+  }
+
   _onMapCreated( GoogleMapController controller ){
     _controller.complete( controller );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getLastKnownLocation();
+    _addListenerOfLocalization();
   }
 
   @override
@@ -74,11 +136,9 @@ class _PassengerPageState extends State<PassengerPage> {
       body: Container(
         child: GoogleMap(
           mapType: MapType.normal,
-          initialCameraPosition: CameraPosition(
-              target: LatLng(-19.931824, -43.935333),
-              zoom: 16
-          ),
+          initialCameraPosition: _cameraPosition,
           onMapCreated: _onMapCreated,
+          myLocationEnabled: true,
         ),
       ),
     );
