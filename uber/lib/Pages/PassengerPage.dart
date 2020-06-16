@@ -24,6 +24,7 @@ class _PassengerPageState extends State<PassengerPage> {
   CameraPosition _cameraPosition = CameraPosition(
       target: LatLng(-19.931824, -43.935333)
   );
+  Set<Marker> _markers = {};
 
   _logoutUser() async {
 
@@ -50,10 +51,13 @@ class _PassengerPageState extends State<PassengerPage> {
   _getLastKnownLocation() async {
 
     Position position = await Geolocator()
-        .getLastKnownPosition( desiredAccuracy: LocationAccuracy.high );
+        .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
 
     setState(() {
-      if( position != null ){
+      if(position != null){
+
+        _showPassengerMarker(position);
+
         _cameraPosition = CameraPosition(
             target: LatLng(position.latitude, position.longitude),
             zoom: 19
@@ -85,7 +89,9 @@ class _PassengerPageState extends State<PassengerPage> {
         distanceFilter: 10
     );
 
-    geolocator.getPositionStream( locationOptions ).listen((Position position){
+    geolocator.getPositionStream(locationOptions).listen((Position position){
+
+      _showPassengerMarker(position);
 
       _cameraPosition = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
@@ -98,8 +104,34 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
-  _onMapCreated( GoogleMapController controller ){
-    _controller.complete( controller );
+  _showPassengerMarker(Position local) async {
+
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "images/passageiro.png"
+    ).then((BitmapDescriptor icone){
+
+      Marker passengerMarker = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(local.latitude, local.longitude),
+          infoWindow: InfoWindow(
+              title: "Meu local"
+          ),
+          icon: icone
+      );
+
+      setState(() {
+        _markers.add(passengerMarker);
+      });
+
+    });
+
+  }
+
+  _onMapCreated(GoogleMapController controller){
+    _controller.complete(controller);
   }
 
   @override
@@ -140,8 +172,9 @@ class _PassengerPageState extends State<PassengerPage> {
               mapType: MapType.normal,
               initialCameraPosition: _cameraPosition,
               onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
+              //myLocationEnabled: true,
               myLocationButtonEnabled: false,
+              markers: _markers,
             ),
             Positioned(
               top: 0,
