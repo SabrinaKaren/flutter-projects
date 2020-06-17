@@ -3,7 +3,6 @@
 */
 
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +31,12 @@ class _PassengerPageState extends State<PassengerPage> {
   );
   Set<Marker> _markers = {};
   TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
+
+  // Controles para exibição na tela
+  bool _showDestinationBox = true;
+  String _buttonText = "Chamar uber";
+  Color _buttonColor = Color(0xff1ebbd8);
+  Function _buttonFunction;
 
   _logoutUser() async {
 
@@ -208,6 +213,42 @@ class _PassengerPageState extends State<PassengerPage> {
 
     db.collection("requisicoes").add(request.toMap());
 
+    _statusWaiting();
+
+  }
+
+  _changeMainButton(String text, Color color, Function function){
+
+    setState(() {
+      _buttonText = text;
+      _buttonColor = color;
+      _buttonFunction = function;
+    });
+
+  }
+
+  _uberStatusNotCalled(){
+
+    _showDestinationBox = true;
+
+    _changeMainButton(
+        "Chamar uber",
+        Color(0xff1ebbd8),
+        (){_callUber();}
+    );
+
+  }
+
+  _statusWaiting(){
+
+    _showDestinationBox = false;
+
+    _changeMainButton(
+        "Cancelar",
+        Colors.red,
+        (){_callUber();}
+    );
+
   }
 
   _onMapCreated(GoogleMapController controller){
@@ -219,6 +260,7 @@ class _PassengerPageState extends State<PassengerPage> {
     super.initState();
     _getLastKnownLocation();
     _addListenerOfLocalization();
+    _uberStatusNotCalled();
   }
 
   @override
@@ -256,66 +298,73 @@ class _PassengerPageState extends State<PassengerPage> {
               myLocationButtonEnabled: false,
               markers: _markers,
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(3),
-                      color: Colors.white
-                  ),
-                  child: TextField(
-                    readOnly: true,
-                    decoration: InputDecoration(
-                        icon: Container(
-                          margin: EdgeInsets.only(left: 20),
-                          width: 10,
-                          height: 10,
-                          child: Icon(Icons.location_on, color: Colors.green,),
+            Visibility(
+              visible: _showDestinationBox,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(3),
+                            color: Colors.white
                         ),
-                        hintText: "Meu local",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 15, top: 16)
+                        child: TextField(
+                          readOnly: true,
+                          decoration: InputDecoration(
+                              icon: Container(
+                                margin: EdgeInsets.only(left: 20),
+                                width: 10,
+                                height: 10,
+                                child: Icon(Icons.location_on, color: Colors.green,),
+                              ),
+                              hintText: "Meu local",
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(left: 15, top: 16)
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 55,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(3),
-                      color: Colors.white
-                  ),
-                  child: TextField(
-                    controller: _controllerDestination,
-                    decoration: InputDecoration(
-                        icon: Container(
-                          margin: EdgeInsets.only(left: 20),
-                          width: 10,
-                          height: 10,
-                          child: Icon(Icons.local_taxi, color: Colors.black,),
+                  Positioned(
+                    top: 55,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(3),
+                            color: Colors.white
                         ),
-                        hintText: "Digite o destino",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 15, top: 16)
+                        child: TextField(
+                          controller: _controllerDestination,
+                          decoration: InputDecoration(
+                              icon: Container(
+                                margin: EdgeInsets.only(left: 20),
+                                width: 10,
+                                height: 10,
+                                child: Icon(Icons.local_taxi, color: Colors.black,),
+                              ),
+                              hintText: "Digite o destino",
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(left: 15, top: 16)
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
             Positioned(
@@ -326,14 +375,12 @@ class _PassengerPageState extends State<PassengerPage> {
                 padding: EdgeInsets.all(10),
                 child: RaisedButton(
                     child: Text(
-                      "Chamar Uber",
+                      _buttonText,
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Color(0xff1ebbd8),
+                    color: _buttonColor,
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: (){
-                      _callUber();
-                    }
+                    onPressed: _buttonFunction,
                 ),
               ),
             )
