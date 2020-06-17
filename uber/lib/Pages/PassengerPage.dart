@@ -4,12 +4,17 @@
 
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber/Data/DestinationData.dart';
+import 'package:uber/Data/RequestData.dart';
+import 'package:uber/Data/UserData.dart';
+import 'package:uber/Utils/RequestStatus.dart';
+import 'package:uber/Utils/UserOfFirebase.dart';
 
 class PassengerPage extends StatefulWidget {
   @override
@@ -175,9 +180,8 @@ class _PassengerPageState extends State<PassengerPage> {
                   FlatButton(
                     child: Text("Confirmar", style: TextStyle(color: Colors.green),),
                     onPressed: (){
-
+                      _saveRequest(destination);
                       Navigator.pop(contex);
-
                     },
                   )
                 ],
@@ -188,6 +192,21 @@ class _PassengerPageState extends State<PassengerPage> {
       }
 
     }
+
+  }
+
+  _saveRequest(DestinationData destination) async {
+
+    UserData passenger = await UserOfFirebase.getUserLoggedInfo();
+
+    RequestData request = RequestData();
+    request.destination = destination;
+    request.passenger = passenger;
+    request.status = RequestStatus.AGUARDANDO;
+
+    Firestore db = Firestore.instance;
+
+    db.collection("requisicoes").add(request.toMap());
 
   }
 
