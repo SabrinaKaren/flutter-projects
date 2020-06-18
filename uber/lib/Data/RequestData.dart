@@ -2,6 +2,7 @@
   Sabrina Karen
 */
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uber/Data/DestinationData.dart';
 import 'package:uber/Data/UserData.dart';
 
@@ -13,7 +14,14 @@ class RequestData{
   UserData _driver;
   DestinationData _destination;
 
-  RequestData();
+  RequestData(){
+
+    Firestore db = Firestore.instance;
+
+    DocumentReference ref = db.collection("requisicoes").document();
+    this.id = ref.documentID;
+
+  }
 
   Map<String, dynamic> toMap(){
 
@@ -34,6 +42,7 @@ class RequestData{
     };
 
     Map<String, dynamic> requestInfo = {
+      "id" : this.id,
       "status" : this.status,
       "passageiro" : passengerInfo,
       "motorista" : null,

@@ -211,9 +211,22 @@ class _PassengerPageState extends State<PassengerPage> {
 
     Firestore db = Firestore.instance;
 
-    db.collection("requisicoes").add(request.toMap());
+    // salvar requisição
+    db.collection("requisicoes")
+        .document(request.id)
+        .setData(request.toMap());
 
-    _statusWaiting();
+    // salvar requisição ativa
+    Map<String, dynamic> activeRequisitionData = {};
+    activeRequisitionData["id_requisicao"] = request.id;
+    activeRequisitionData["id_usuario"] = passenger.userId;
+    activeRequisitionData["status"] = RequestStatus.AGUARDANDO;
+
+    db.collection("requisicao_ativa")
+        .document(passenger.userId)
+        .setData(activeRequisitionData);
+
+    db.collection("requisicoes").add(request.toMap());
 
   }
 
@@ -251,6 +264,47 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
+  _addListenerActiveRequest() async {
+
+    FirebaseUser firebaseUser = await UserOfFirebase.getCurrentUser();
+
+    Firestore db = Firestore.instance;
+
+    await db.collection("requisicao_ativa")
+        .document(firebaseUser.uid)
+        .snapshots()
+        .listen((snapshot) {
+
+      if (snapshot.data != null){
+
+        Map<String, dynamic> data = snapshot.data;
+        String status = data["status"];
+        String requestId = data["id_requisicao"];
+
+        switch(status){
+          case RequestStatus.AGUARDANDO :
+            _statusWaiting();
+            break;
+          case RequestStatus.A_CAMINHO :
+
+            break;
+          case RequestStatus.VIAGEM :
+
+            break;
+          case RequestStatus.FINALIZADA :
+
+            break;
+
+        }
+
+      }else{
+        _uberStatusNotCalled();
+      }
+
+    });
+
+  }
+
   _onMapCreated(GoogleMapController controller){
     _controller.complete(controller);
   }
@@ -260,7 +314,7 @@ class _PassengerPageState extends State<PassengerPage> {
     super.initState();
     _getLastKnownLocation();
     _addListenerOfLocalization();
-    _uberStatusNotCalled();
+    _addListenerActiveRequest();
   }
 
   @override
