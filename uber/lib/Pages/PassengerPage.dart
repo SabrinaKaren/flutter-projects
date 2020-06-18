@@ -31,6 +31,7 @@ class _PassengerPageState extends State<PassengerPage> {
   );
   Set<Marker> _markers = {};
   TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
+  String _requestId;
 
   // Controles para exibição na tela
   bool _showDestinationBox = true;
@@ -259,8 +260,26 @@ class _PassengerPageState extends State<PassengerPage> {
     _changeMainButton(
         "Cancelar",
         Colors.red,
-        (){_callUber();}
+        (){_cancelUber();}
     );
+
+  }
+
+  _cancelUber() async {
+
+    FirebaseUser firebaseUser = await UserOfFirebase.getCurrentUser();
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+        .document(_requestId).updateData({
+      "status" : RequestStatus.CANCELADA
+    }).then((_){
+
+      db.collection("requisicao_ativa")
+          .document( firebaseUser.uid )
+          .delete();
+
+    });
 
   }
 
@@ -279,7 +298,7 @@ class _PassengerPageState extends State<PassengerPage> {
 
         Map<String, dynamic> data = snapshot.data;
         String status = data["status"];
-        String requestId = data["id_requisicao"];
+        _requestId = data["id_requisicao"];
 
         switch(status){
           case RequestStatus.AGUARDANDO :
