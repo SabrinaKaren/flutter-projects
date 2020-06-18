@@ -15,8 +15,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  TextEditingController _controllerEmail = TextEditingController();
-  TextEditingController _controllerPassword = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController(text: "sabrina.passageiro@hotmail.com");
+  TextEditingController _controllerPassword = TextEditingController(text: "1234567");
   String _errorMsg = "";
   bool _loading = false;
 

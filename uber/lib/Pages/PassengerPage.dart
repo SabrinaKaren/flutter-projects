@@ -227,8 +227,6 @@ class _PassengerPageState extends State<PassengerPage> {
         .document(passenger.userId)
         .setData(activeRequisitionData);
 
-    db.collection("requisicoes").add(request.toMap());
-
   }
 
   _changeMainButton(String text, Color color, Function function){
