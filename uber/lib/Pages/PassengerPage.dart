@@ -33,7 +33,7 @@ class _PassengerPageState extends State<PassengerPage> {
   TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
   String _requestId;
 
-  // Controles para exibição na tela
+  // controles para exibição na tela
   bool _showDestinationBox = true;
   String _buttonText = "Chamar uber";
   Color _buttonColor = Color(0xff1ebbd8);

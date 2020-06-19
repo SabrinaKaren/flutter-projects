@@ -7,10 +7,13 @@ import 'package:uber/Pages/DriverPage.dart';
 import 'package:uber/Pages/HomePage.dart';
 import 'package:uber/Pages/PassengerPage.dart';
 import 'package:uber/Pages/RegisterPage.dart';
+import 'package:uber/Pages/RunPage.dart';
 
 class Routes {
 
   static Route<dynamic> generateRoutes(RouteSettings settings){
+
+    final args = settings.arguments;
 
     switch( settings.name ){
       case "/" :
@@ -28,6 +31,12 @@ class Routes {
       case "/passageiro" :
         return MaterialPageRoute(
             builder: (_) => PassengerPage()
+        );
+      case "/corrida" :
+        return MaterialPageRoute(
+            builder: (_) => RunPage(
+                args
+            )
         );
       default:
         _errorRoute();
