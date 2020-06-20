@@ -4,10 +4,14 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uber/Data/UserData.dart';
+import 'package:uber/Utils/RequestStatus.dart';
+import 'package:uber/Utils/UserOfFirebase.dart';
 
 class RunPage extends StatefulWidget {
 
@@ -26,6 +30,8 @@ class _RunPageState extends State<RunPage> {
       target: LatLng(-19.931824, -43.935333)
   );
   Set<Marker> _markers = {};
+  Map<String, dynamic> _requestData;
+  Position _driverLocal;
 
   // controles para exibição na tela
   String _buttonText = "Aceitar corrida";
@@ -50,12 +56,18 @@ class _RunPageState extends State<RunPage> {
     var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
 
     geolocator.getPositionStream(locationOptions).listen((Position position) {
+
       _showPassengerMarker(position);
       _cameraPosition = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
           zoom: 19
       );
       _moveCamera(_cameraPosition);
+
+      setState(() {
+        _driverLocal = position;
+      });
+
     });
 
   }
@@ -103,6 +115,112 @@ class _RunPageState extends State<RunPage> {
       });
 
     });
+
+  }
+
+  _getRequest() async {
+
+    String requestId = widget.requestId;
+
+    Firestore db = Firestore.instance;
+    DocumentSnapshot documentSnapshot = await db
+        .collection("requisicoes")
+        .document(requestId)
+        .get();
+
+    _requestData = documentSnapshot.data;
+    _addListenerOfRequest();
+
+  }
+
+  _addListenerOfRequest() async {
+
+    Firestore db = Firestore.instance;
+    String requestId = _requestData["id"];
+    await db.collection("requisicoes")
+        .document(requestId).snapshots().listen((snapshot){
+
+      if(snapshot.data != null){
+
+        Map<String, dynamic> data = snapshot.data;
+        String status = data["status"];
+
+        switch(status){
+          case RequestStatus.AGUARDANDO :
+            _statusWaiting();
+            break;
+          case RequestStatus.A_CAMINHO :
+            _statusOnTheWay();
+            break;
+          case RequestStatus.VIAGEM :
+
+            break;
+          case RequestStatus.FINALIZADA :
+
+            break;
+        }
+
+      }
+
+    });
+
+  }
+
+  _statusWaiting() {
+
+    _changeMainButton(
+        "Aceitar corrida",
+        Color(0xff1ebbd8),
+            () {_acceptRun();}
+    );
+
+  }
+
+  _statusOnTheWay() {
+
+    _changeMainButton(
+        "A caminho do passageiro",
+        Colors.grey,
+        null
+    );
+
+  }
+
+  _acceptRun() async {
+
+    // recuperar dados do motorista
+    UserData driver = await UserOfFirebase.getUserLoggedInfo();
+    driver.latitude = _driverLocal.latitude;
+    driver.longitude = _driverLocal.longitude;
+
+    Firestore db = Firestore.instance;
+    String requestId = _requestData["id"];
+
+    db.collection("requisicoes")
+        .document(requestId).updateData({
+      "motorista" : driver.toMap(),
+      "status" : RequestStatus.A_CAMINHO,
+    }).then((_){
+
+      // atualiza requisicao ativa
+      String idPassageiro = _requestData["passageiro"]["idUsuario"];
+      db.collection("requisicao_ativa")
+          .document( idPassageiro ).updateData({
+        "status" : RequestStatus.A_CAMINHO,
+      });
+
+      // salvar requisicao ativa para motorista
+      String driverId = driver.userId;
+      db.collection("requisicao_ativa_motorista")
+          .document(driverId)
+          .setData({
+        "id_requisicao" : requestId,
+        "id_usuario" : driverId,
+        "status" : RequestStatus.A_CAMINHO,
+      });
+
+    });
+
   }
 
   @override
@@ -110,6 +228,7 @@ class _RunPageState extends State<RunPage> {
     super.initState();
     _getLastKnownLocation();
     _addListenerOfLocalization();
+    _getRequest();
   }
 
   @override

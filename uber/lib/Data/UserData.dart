@@ -10,6 +10,15 @@ class UserData{
   String _password;
   String _userType;
 
+  double _latitude;
+  double _longitude;
+
+  double get latitude => _latitude;
+
+  set latitude(double value) {
+    _latitude = value;
+  }
+
   UserData();
 
   Map<String, dynamic> toMap(){
@@ -56,6 +65,12 @@ class UserData{
 
   set userId(String value) {
     _userId = value;
+  }
+
+  double get longitude => _longitude;
+
+  set longitude(double value) {
+    _longitude = value;
   }
 
 }
