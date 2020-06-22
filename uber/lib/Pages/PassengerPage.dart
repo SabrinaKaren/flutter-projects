@@ -263,6 +263,18 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
+  _statusOnTheWay() {
+
+    _showDestinationBox = false;
+
+    _changeMainButton(
+        "Motorista a caminho",
+        Colors.grey,
+        () { }
+    );
+
+  }
+
   _cancelUber() async {
 
     FirebaseUser firebaseUser = await UserOfFirebase.getCurrentUser();
@@ -303,7 +315,7 @@ class _PassengerPageState extends State<PassengerPage> {
             _statusWaiting();
             break;
           case RequestStatus.A_CAMINHO :
-
+            _statusOnTheWay();
             break;
           case RequestStatus.VIAGEM :
 

@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uber/Utils/RequestStatus.dart';
+import 'package:uber/Utils/UserOfFirebase.dart';
 
 class DriverPage extends StatefulWidget {
   @override
@@ -56,10 +57,35 @@ class _DriverPageState extends State<DriverPage> {
 
   }
 
+  _getActiveDriverRequest() async {
+
+    FirebaseUser firebaseUser = await UserOfFirebase.getCurrentUser();
+
+    DocumentSnapshot documentSnapshot = await db
+        .collection("requisicao_ativa_motorista")
+        .document(firebaseUser.uid).get();
+
+    var requestData = documentSnapshot.data;
+
+    if(requestData == null){
+      _addRequestsListener();
+    }else{
+
+      String requestId = requestData["id_requisicao"];
+      Navigator.pushReplacementNamed(
+          context,
+          "/corrida",
+          arguments: requestId
+      );
+
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
-    _addRequestsListener();
+    _getActiveDriverRequest();
   }
 
   @override
