@@ -27,6 +27,8 @@ class UserData{
       "nome" : this.name,
       "email" : this.email,
       "tipoUsuario" : this.userType,
+      "latitude"    : this.latitude,
+      "longitude"   : this.longitude,
     };
 
     return map;

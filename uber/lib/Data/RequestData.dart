@@ -30,6 +30,8 @@ class RequestData{
       "email" : this.passenger.email,
       "tipoUsuario" : this.passenger.userType,
       "idUsuario" : this.passenger.userId,
+      "latitude" : this.passenger.latitude,
+      "longitude" : this.passenger.longitude,
     };
 
     Map<String, dynamic> destinationInfo = {

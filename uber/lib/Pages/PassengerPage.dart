@@ -32,6 +32,7 @@ class _PassengerPageState extends State<PassengerPage> {
   Set<Marker> _markers = {};
   TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
   String _requestId;
+  Position _passengerLocal;
 
   // controles para exibição na tela
   bool _showDestinationBox = true;
@@ -76,6 +77,8 @@ class _PassengerPageState extends State<PassengerPage> {
             zoom: 19
         );
 
+        _passengerLocal = position;
+
         _moveCamera(_cameraPosition);
 
       }
@@ -110,6 +113,8 @@ class _PassengerPageState extends State<PassengerPage> {
           target: LatLng(position.latitude, position.longitude),
           zoom: 19
       );
+
+      _passengerLocal = position;
 
       _moveCamera(_cameraPosition);
 
@@ -204,6 +209,8 @@ class _PassengerPageState extends State<PassengerPage> {
   _saveRequest(DestinationData destination) async {
 
     UserData passenger = await UserOfFirebase.getUserLoggedInfo();
+    passenger.latitude = _passengerLocal.latitude;
+    passenger.longitude = _passengerLocal.longitude;
 
     RequestData request = RequestData();
     request.destination = destination;
