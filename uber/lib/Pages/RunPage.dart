@@ -30,7 +30,10 @@ class _RunPageState extends State<RunPage> {
   );
   Set<Marker> _markers = {};
   Map<String, dynamic> _requestData;
-  String _statusMsg;
+  String _statusMsg = "";
+  String _requestId;
+  String _requestStatus = RequestStatus.AGUARDANDO;
+  Position _driverLocal;
 
   // controles para exibição na tela
   String _buttonText = "Aceitar corrida";
@@ -56,7 +59,29 @@ class _RunPageState extends State<RunPage> {
 
     geolocator.getPositionStream(locationOptions).listen((Position position) {
 
-      if( position != null ){
+      if(position != null){
+
+        if(_requestId != null && _requestId.isNotEmpty){
+
+          if(_requestStatus != RequestStatus.AGUARDANDO){
+
+            UserOfFirebase.updateLocationData(
+                _requestId,
+                position.latitude,
+                position.longitude
+            );
+
+          }else{
+
+            setState(() {
+              _driverLocal = position;
+            });
+
+            _statusWaiting();
+
+          }
+
+        }
 
       }
 
@@ -132,18 +157,17 @@ class _RunPageState extends State<RunPage> {
   _addListenerOfRequest() async {
 
     Firestore db = Firestore.instance;
-    String requestId = _requestData["id"];
     await db.collection("requisicoes")
-        .document(requestId).snapshots().listen((snapshot){
+        .document(_requestId).snapshots().listen((snapshot){
 
       if(snapshot.data != null){
 
         _requestData = snapshot.data;
 
         Map<String, dynamic> data = snapshot.data;
-        String status = data["status"];
+        _requestStatus = data["status"];
 
-        switch(status){
+        switch(_requestStatus){
           case RequestStatus.AGUARDANDO :
             _statusWaiting();
             break;
@@ -172,8 +196,8 @@ class _RunPageState extends State<RunPage> {
         () {_acceptRun();}
     );
 
-    double driverLat = _requestData["motorista"]["latitude"];
-    double driverLon = _requestData["motorista"]["longitude"];
+    double driverLat = _driverLocal.latitude;
+    double driverLon = _driverLocal.longitude;
 
     Position position = Position(
         latitude: driverLat, longitude: driverLon
@@ -336,8 +360,8 @@ class _RunPageState extends State<RunPage> {
   @override
   void initState() {
     super.initState();
+    _requestId = widget.requestId;
     _addListenerOfRequest();
-    _getLastKnownLocation();
     _addListenerOfLocalization();
   }
 

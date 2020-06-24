@@ -33,6 +33,7 @@ class _PassengerPageState extends State<PassengerPage> {
   TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
   String _requestId;
   Position _passengerLocal;
+  Map<String, dynamic> _requestData;
 
   // controles para exibição na tela
   bool _showDestinationBox = true;
@@ -107,16 +108,20 @@ class _PassengerPageState extends State<PassengerPage> {
 
     geolocator.getPositionStream(locationOptions).listen((Position position){
 
-      _showPassengerMarker(position);
+      if(_requestId != null && _requestId.isNotEmpty){
 
-      _cameraPosition = CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 19
-      );
+        // atualiza local do passageiro
+        UserOfFirebase.updateLocationData(
+            _requestId,
+            position.latitude,
+            position.longitude
+        );
 
-      _passengerLocal = position;
-
-      _moveCamera(_cameraPosition);
+      }else if( position != null ){
+        setState(() {
+          _passengerLocal = position;
+        });
+      }
 
     });
 
@@ -234,6 +239,8 @@ class _PassengerPageState extends State<PassengerPage> {
         .document(passenger.userId)
         .setData(activeRequisitionData);
 
+    _statusWaiting();
+
   }
 
   _changeMainButton(String text, Color color, Function function){
@@ -256,6 +263,19 @@ class _PassengerPageState extends State<PassengerPage> {
         (){_callUber();}
     );
 
+    Position position = Position(
+        latitude: _passengerLocal.latitude,
+        longitude: _passengerLocal.longitude
+    );
+
+    _showPassengerMarker(position);
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 19
+    );
+
+    _moveCamera(cameraPosition);
+
   }
 
   _statusWaiting(){
@@ -267,6 +287,22 @@ class _PassengerPageState extends State<PassengerPage> {
         Colors.red,
         (){_cancelUber();}
     );
+
+    double passengerLat = _requestData["passageiro"]["latitude"];
+    double passengerLon = _requestData["passageiro"]["longitude"];
+    Position position = Position(
+        latitude: passengerLat,
+        longitude: passengerLon
+    );
+
+    _showPassengerMarker(position);
+
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 19
+    );
+
+    _moveCamera(cameraPosition);
 
   }
 
@@ -333,6 +369,8 @@ class _PassengerPageState extends State<PassengerPage> {
           if(snapshot.data != null){
 
             Map<String, dynamic> data = snapshot.data;
+            _requestData = data;
+
             String status = data["status"];
             requestId = data["id_requisicao"];
 
@@ -366,7 +404,6 @@ class _PassengerPageState extends State<PassengerPage> {
   void initState() {
     super.initState();
     _getActiveRequest();
-    _getLastKnownLocation();
     _addListenerOfLocalization();
   }
 
