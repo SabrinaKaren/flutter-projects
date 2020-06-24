@@ -210,6 +210,31 @@ class _RunPageState extends State<RunPage> {
         LatLng(passengerLatitude, passengerLongitude)
     );
 
+    var nLat, nLon, sLat, sLon;
+
+    if(driverLatitude <=  passengerLatitude){
+      sLat = driverLatitude;
+      nLat = passengerLatitude;
+    }else{
+      sLat = passengerLatitude;
+      nLat = driverLatitude;
+    }
+
+    if(driverLongitude <=  passengerLongitude){
+      sLon = driverLongitude;
+      nLon = passengerLongitude;
+    }else{
+      sLon = passengerLongitude;
+      nLon = driverLongitude;
+    }
+    //-23.560925, -46.650623
+    _moveCameraBounds(
+        LatLngBounds(
+            northeast: LatLng(nLat, nLon),
+            southwest: LatLng(sLat, sLon)
+        )
+    );
+
   }
 
   _showTwoMarkers(LatLng driverLatLng, LatLng passengerLatLng){
@@ -243,10 +268,6 @@ class _RunPageState extends State<RunPage> {
 
     setState(() {
       _markers = _markersList;
-      _moveCamera(CameraPosition(
-          target: LatLng(driverLatLng.latitude, driverLatLng.longitude),
-          zoom: 18
-      ));
     });
 
   }
@@ -288,6 +309,19 @@ class _RunPageState extends State<RunPage> {
       _getTest();
 
     });
+
+  }
+
+  _moveCameraBounds(LatLngBounds latLngBounds) async {
+
+    GoogleMapController googleMapController = await _controller.future;
+    googleMapController
+        .animateCamera(
+        CameraUpdate.newLatLngBounds(
+            latLngBounds,
+            100
+        )
+    );
 
   }
 
