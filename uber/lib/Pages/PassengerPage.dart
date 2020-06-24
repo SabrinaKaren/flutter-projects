@@ -300,44 +300,61 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
-  _addListenerActiveRequest() async {
+  _getActiveRequest() async {
 
     FirebaseUser firebaseUser = await UserOfFirebase.getCurrentUser();
 
     Firestore db = Firestore.instance;
-
-    await db.collection("requisicao_ativa")
+    DocumentSnapshot documentSnapshot = await db
+        .collection("requisicao_ativa")
         .document(firebaseUser.uid)
+        .get();
+
+    if( documentSnapshot.data != null ){
+
+      Map<String, dynamic> data = documentSnapshot.data;
+      _requestId = data["id_requisicao"];
+      _addListenerOfRequest(_requestId);
+
+    }else{
+      _uberStatusNotCalled();
+    }
+
+  }
+
+  _addListenerOfRequest(String requestId) async {
+
+    Firestore db = Firestore.instance;
+    await db.collection("requisicoes")
+        .document(requestId)
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot){
 
-      if (snapshot.data != null){
+          if(snapshot.data != null){
 
-        Map<String, dynamic> data = snapshot.data;
-        String status = data["status"];
-        _requestId = data["id_requisicao"];
+            Map<String, dynamic> data = snapshot.data;
+            String status = data["status"];
+            requestId = data["id_requisicao"];
 
-        switch(status){
-          case RequestStatus.AGUARDANDO :
-            _statusWaiting();
-            break;
-          case RequestStatus.A_CAMINHO :
-            _statusOnTheWay();
-            break;
-          case RequestStatus.VIAGEM :
+            switch(status){
+              case RequestStatus.AGUARDANDO :
+                _statusWaiting();
+                break;
+              case RequestStatus.A_CAMINHO :
+                _statusOnTheWay();
+                break;
+              case RequestStatus.VIAGEM :
 
-            break;
-          case RequestStatus.FINALIZADA :
+                break;
+              case RequestStatus.FINALIZADA :
 
-            break;
+                break;
 
-        }
+            }
 
-      }else{
-        _uberStatusNotCalled();
-      }
+          }
 
-    });
+        });
 
   }
 
@@ -348,9 +365,9 @@ class _PassengerPageState extends State<PassengerPage> {
   @override
   void initState() {
     super.initState();
+    _getActiveRequest();
     _getLastKnownLocation();
     _addListenerOfLocalization();
-    _addListenerActiveRequest();
   }
 
   @override
