@@ -24,6 +24,7 @@ class UserData{
   Map<String, dynamic> toMap(){
 
     Map<String, dynamic> map = {
+      "idUsuario" : this.userId,
       "nome" : this.name,
       "email" : this.email,
       "tipoUsuario" : this.userType,

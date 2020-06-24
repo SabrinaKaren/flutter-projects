@@ -71,12 +71,12 @@ class _RunPageState extends State<RunPage> {
                 position.longitude
             );
 
-          }else{
+          } else{
+
 
             setState(() {
               _driverLocal = position;
             });
-
             _statusWaiting();
 
           }
@@ -140,25 +140,11 @@ class _RunPageState extends State<RunPage> {
 
   }
 
-  _getTest() async {
-
-    String requestId = widget.requestId;
-
-    Firestore db = Firestore.instance;
-    DocumentSnapshot documentSnapshot = await db
-        .collection("requisicoes")
-        .document(requestId)
-        .get();
-
-    _requestData = documentSnapshot.data;
-
-  }
-
   _addListenerOfRequest() async {
 
     Firestore db = Firestore.instance;
-    await db.collection("requisicoes")
-        .document(_requestId).snapshots().listen((snapshot){
+
+    await db.collection("requisicoes").document(_requestId).snapshots().listen((snapshot){
 
       if(snapshot.data != null){
 
@@ -180,6 +166,7 @@ class _RunPageState extends State<RunPage> {
           case RequestStatus.FINALIZADA :
 
             break;
+
         }
 
       }
@@ -193,27 +180,33 @@ class _RunPageState extends State<RunPage> {
     _changeMainButton(
         "Aceitar corrida",
         Color(0xff1ebbd8),
-        () {_acceptRun();}
-    );
+            () {
+          _acceptRun();
+        });
 
-    double driverLat = _driverLocal.latitude;
-    double driverLon = _driverLocal.longitude;
+    if(_driverLocal != null){
 
-    Position position = Position(
-        latitude: driverLat, longitude: driverLon
-    );
+      double driverLat = _driverLocal.latitude;
+      double driverLon = _driverLocal.longitude;
 
-    _showMarker(
-        position,
-        "images/motorista.png",
-        "Motorista"
-    );
+      Position position = Position(
+          latitude: driverLat, longitude: driverLon
+      );
 
-    CameraPosition cameraPosition = CameraPosition(
-        target: LatLng(position.latitude, position.longitude),
-        zoom: 19
-    );
-    _moveCamera(cameraPosition);
+      _showMarker(
+          position,
+          "images/motorista.png",
+          "Motorista"
+      );
+
+      CameraPosition cameraPosition = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 19
+      );
+
+      _moveCamera(cameraPosition);
+
+    }
 
   }
 
@@ -224,38 +217,39 @@ class _RunPageState extends State<RunPage> {
     _changeMainButton(
         "Iniciar corrida",
         Color(0xff1ebbd8),
-        () {_startRun();}
+            (){
+          _startRun();
+        }
     );
 
-    double passengerLatitude = _requestData["passageiro"]["latitude"];
-    double passengerLongitude = _requestData["passageiro"]["longitude"];
+    double passengerLat = _requestData["passageiro"]["latitude"];
+    double passengerLon = _requestData["passageiro"]["longitude"];
 
-    double driverLatitude = _requestData["motorista"]["latitude"];
-    double driverLongitude = _requestData["motorista"]["longitude"];
+    double driverLat = _requestData["motorista"]["latitude"];
+    double driverLon = _requestData["motorista"]["longitude"];
 
     _showTwoMarkers(
-        LatLng(driverLatitude, driverLongitude),
-        LatLng(passengerLatitude, passengerLongitude)
+        LatLng(driverLat, driverLon),
+        LatLng(passengerLat, passengerLon)
     );
-
     var nLat, nLon, sLat, sLon;
 
-    if(driverLatitude <=  passengerLatitude){
-      sLat = driverLatitude;
-      nLat = passengerLatitude;
+    if(driverLat <=  passengerLat){
+      sLat = driverLat;
+      nLat = passengerLat;
     }else{
-      sLat = passengerLatitude;
-      nLat = driverLatitude;
+      sLat = passengerLat;
+      nLat = driverLat;
     }
 
-    if(driverLongitude <=  passengerLongitude){
-      sLon = driverLongitude;
-      nLon = passengerLongitude;
+    if(driverLon <=  passengerLon){
+      sLon = driverLon;
+      nLon = passengerLon;
     }else{
-      sLon = passengerLongitude;
-      nLon = driverLongitude;
+      sLon = passengerLon;
+      nLon = driverLon;
     }
-    //-23.560925, -46.650623
+
     _moveCameraBounds(
         LatLngBounds(
             northeast: LatLng(nLat, nLon),
@@ -267,80 +261,26 @@ class _RunPageState extends State<RunPage> {
 
   _startRun(){
 
-  }
-
-  _showTwoMarkers(LatLng driverLatLng, LatLng passengerLatLng){
-
-    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-    Set<Marker> _markersList = {};
-    BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: pixelRatio),
-        "images/motorista.png")
-        .then((BitmapDescriptor icone) {
-      Marker marker1 = Marker(
-          markerId: MarkerId("marcador-motorista"),
-          position: LatLng(driverLatLng.latitude, driverLatLng.longitude),
-          infoWindow: InfoWindow(title: "Local motorista"),
-          icon: icone);
-      _markersList.add(marker1);
-    });
-
-    BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: pixelRatio),
-        "images/passageiro.png")
-        .then((BitmapDescriptor icone) {
-      Marker marker2 = Marker(
-          markerId: MarkerId("marcador-passageiro"),
-          position: LatLng(passengerLatLng.latitude, passengerLatLng.longitude),
-          infoWindow: InfoWindow(title: "Local passageiro"),
-          icon: icone);
-      _markersList.add(marker2);
-    });
-
-    setState(() {
-      _markers = _markersList;
-    });
-
-  }
-
-  _acceptRun() async {
-
-    // recuperar dados do motorista
-    UserData driver = await UserOfFirebase.getUserLoggedInfo();
-    driver.latitude = _requestData["motorista"]["latitude"];
-    driver.longitude = _requestData["motorista"]["longitude"];
-
     Firestore db = Firestore.instance;
-    String requestId = _requestData["id"];
-
     db.collection("requisicoes")
-        .document(requestId).updateData({
-      "motorista" : driver.toMap(),
-      "status" : RequestStatus.A_CAMINHO,
-    }).then((_){
-
-      // atualiza requisicao ativa
-      String passengerId = _requestData["passageiro"]["idUsuario"];
-      db.collection("requisicao_ativa")
-          .document(passengerId).updateData({
-        "status" : RequestStatus.A_CAMINHO,
-      });
-
-      // salvar requisicao ativa para motorista
-      String driverId = driver.userId;
-      db.collection("requisicao_ativa_motorista")
-          .document(driverId)
-          .setData({
-        "id_requisicao" : requestId,
-        "id_usuario" : driverId,
-        "status" : RequestStatus.A_CAMINHO,
-      });
-
-      // teste
-      _getTest();
-
+        .document(_requestId)
+        .updateData({
+      "origem" : {
+        "latitude" : _requestData["motorista"]["latitude"],
+        "longitude" : _requestData["motorista"]["longitude"]
+      },
+      "status" : RequestStatus.VIAGEM
     });
+
+    String passengerId = _requestData["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document(passengerId)
+        .updateData({"status": RequestStatus.VIAGEM });
+
+    String driverId = _requestData["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document(driverId)
+        .updateData({"status": RequestStatus.VIAGEM });
 
   }
 
@@ -354,6 +294,81 @@ class _RunPageState extends State<RunPage> {
             100
         )
     );
+
+  }
+
+  _showTwoMarkers(LatLng driverLatLng, LatLng passengerLatLng){
+
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    Set<Marker> _markersList = {};
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "images/motorista.png")
+        .then((BitmapDescriptor icon) {
+
+      Marker marker1 = Marker(
+          markerId: MarkerId("marcador-motorista"),
+          position: LatLng(driverLatLng.latitude, driverLatLng.longitude),
+          infoWindow: InfoWindow(title: "Local motorista"),
+          icon: icon);
+      _markersList.add(marker1);
+
+    });
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "images/passageiro.png")
+        .then((BitmapDescriptor icon) {
+
+      Marker marker2 = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(passengerLatLng.latitude, passengerLatLng.longitude),
+          infoWindow: InfoWindow(title: "Local passageiro"),
+          icon: icon);
+
+      _markersList.add(marker2);
+
+    });
+
+    setState(() {
+      _markers = _markersList;
+    });
+
+  }
+
+  _acceptRun() async {
+
+    UserData driver = await UserOfFirebase.getUserLoggedInfo();
+    driver.latitude  = _driverLocal.latitude;
+    driver.longitude = _driverLocal.longitude;
+
+    Firestore db = Firestore.instance;
+    String requestId = _requestData["id"];
+
+    db.collection("requisicoes")
+        .document(requestId).updateData({
+      "motorista" : driver.toMap(),
+      "status" : RequestStatus.A_CAMINHO,
+    }).then((_){
+
+      String passengerId = _requestData["passageiro"]["idUsuario"];
+      db.collection("requisicao_ativa")
+          .document(passengerId).updateData({
+        "status" : RequestStatus.A_CAMINHO,
+      });
+
+      String driverId = driver.userId;
+      db.collection("requisicao_ativa_motorista")
+          .document(driverId)
+          .setData({
+        "id_requisicao" : requestId,
+        "id_usuario" : driverId,
+        "status" : RequestStatus.A_CAMINHO,
+      });
+
+    });
 
   }
 

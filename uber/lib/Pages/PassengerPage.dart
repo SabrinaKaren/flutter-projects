@@ -34,6 +34,7 @@ class _PassengerPageState extends State<PassengerPage> {
   String _requestId;
   Position _passengerLocal;
   Map<String, dynamic> _requestData;
+  StreamSubscription<DocumentSnapshot> _streamSubscriptionRequests;
 
   // controles para exibição na tela
   bool _showDestinationBox = true;
@@ -42,34 +43,60 @@ class _PassengerPageState extends State<PassengerPage> {
   Function _buttonFunction;
 
   _logoutUser() async {
-
     FirebaseAuth auth = FirebaseAuth.instance;
-
     await auth.signOut();
     Navigator.pushReplacementNamed(context, "/");
-
   }
 
-  _choiceOfMenu(String choice){
-
-    switch(choice){
-      case "Deslogar" :
+  _choiceOfMenu(String choice) {
+    switch (choice) {
+      case "Deslogar":
         _logoutUser();
         break;
-      case "Configurações" :
-
+      case "Configurações":
         break;
     }
+  }
+
+  _onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+  }
+
+  _addListenerOfLocalization() {
+
+    var geolocator = Geolocator();
+    var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+
+    geolocator.getPositionStream(locationOptions).listen((Position position) {
+
+      if(_requestId != null && _requestId.isNotEmpty){
+
+        UserOfFirebase.updateLocationData(
+            _requestId,
+            position.latitude,
+            position.longitude
+        );
+
+      } else{
+
+        setState(() {
+          _passengerLocal = position;
+        });
+        _statusNotCalled();
+
+      }
+
+    });
 
   }
 
   _getLastKnownLocation() async {
 
-    Position position = await Geolocator()
-        .getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator().getLastKnownPosition(desiredAccuracy: LocationAccuracy.high);
 
     setState(() {
-      if(position != null){
+
+      if (position != null) {
 
         _showPassengerMarker(position);
 
@@ -79,52 +106,17 @@ class _PassengerPageState extends State<PassengerPage> {
         );
 
         _passengerLocal = position;
-
         _moveCamera(_cameraPosition);
 
       }
+
     });
 
   }
 
   _moveCamera(CameraPosition cameraPosition) async {
-
     GoogleMapController googleMapController = await _controller.future;
-    googleMapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-            cameraPosition
-        )
-    );
-
-  }
-
-  _addListenerOfLocalization(){
-
-    var geolocator = Geolocator();
-    var locationOptions = LocationOptions(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10
-    );
-
-    geolocator.getPositionStream(locationOptions).listen((Position position){
-
-      if(_requestId != null && _requestId.isNotEmpty){
-
-        // atualiza local do passageiro
-        UserOfFirebase.updateLocationData(
-            _requestId,
-            position.latitude,
-            position.longitude
-        );
-
-      }else if( position != null ){
-        setState(() {
-          _passengerLocal = position;
-        });
-      }
-
-    });
-
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   _showPassengerMarker(Position local) async {
@@ -133,17 +125,14 @@ class _PassengerPageState extends State<PassengerPage> {
 
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
-        "images/passageiro.png"
-    ).then((BitmapDescriptor icone){
+        "images/passageiro.png")
+        .then((BitmapDescriptor icon) {
 
       Marker passengerMarker = Marker(
           markerId: MarkerId("marcador-passageiro"),
           position: LatLng(local.latitude, local.longitude),
-          infoWindow: InfoWindow(
-              title: "Meu local"
-          ),
-          icon: icone
-      );
+          infoWindow: InfoWindow(title: "Meu local"),
+          icon: icon);
 
       setState(() {
         _markers.add(passengerMarker);
@@ -157,53 +146,57 @@ class _PassengerPageState extends State<PassengerPage> {
 
     String destinationAddress = _controllerDestination.text;
 
-    if(destinationAddress.isNotEmpty){
+    if (destinationAddress.isNotEmpty) {
 
-      List<Placemark> addressList = await Geolocator()
-          .placemarkFromAddress(destinationAddress);
+      List<Placemark> addressList = await Geolocator().placemarkFromAddress(destinationAddress);
 
-      if(addressList != null && addressList.length > 0 ){
+      if (addressList != null && addressList.length > 0) {
 
         Placemark address = addressList[0];
+
         DestinationData destination = DestinationData();
         destination.city = address.subAdministrativeArea;
         destination.cep = address.postalCode;
         destination.neighborhood = address.subLocality;
         destination.street = address.thoroughfare;
         destination.number = address.subThoroughfare;
-
         destination.latitude = address.position.latitude;
         destination.longitude = address.position.longitude;
 
-        String addressConfirmation;
-        addressConfirmation = "\n Cidade: " + destination.city;
-        addressConfirmation += "\n Rua: " + destination.street + ", " + destination.number;
-        addressConfirmation += "\n Bairro: " + destination.neighborhood;
-        addressConfirmation += "\n Cep: " + destination.cep;
+        String addressVerification;
+        addressVerification = "\n Cidade: " + destination.city;
+        addressVerification += "\n Rua: " + destination.street + ", " + destination.number;
+        addressVerification += "\n Bairro: " + destination.neighborhood;
+        addressVerification += "\n Cep: " + destination.cep;
 
         showDialog(
             context: context,
-            builder: (contex){
+            builder: (contex) {
               return AlertDialog(
                 title: Text("Confirmação do endereço"),
-                content: Text(addressConfirmation),
+                content: Text(addressVerification),
                 contentPadding: EdgeInsets.all(16),
                 actions: <Widget>[
                   FlatButton(
-                    child: Text("Cancelar", style: TextStyle(color: Colors.red),),
+                    child: Text(
+                      "Cancelar",
+                      style: TextStyle(color: Colors.red),
+                    ),
                     onPressed: () => Navigator.pop(contex),
                   ),
                   FlatButton(
-                    child: Text("Confirmar", style: TextStyle(color: Colors.green),),
-                    onPressed: (){
-                      _saveRequest(destination);
+                    child: Text(
+                      "Confirmar",
+                      style: TextStyle(color: Colors.green),
+                    ),
+                    onPressed: () {
+                      _saveResquest(destination);
                       Navigator.pop(contex);
                     },
                   )
                 ],
               );
-            }
-        );
+            });
 
       }
 
@@ -211,7 +204,7 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
-  _saveRequest(DestinationData destination) async {
+  _saveResquest(DestinationData destination) async {
 
     UserData passenger = await UserOfFirebase.getUserLoggedInfo();
     passenger.latitude = _passengerLocal.latitude;
@@ -224,85 +217,85 @@ class _PassengerPageState extends State<PassengerPage> {
 
     Firestore db = Firestore.instance;
 
-    // salvar requisição
-    db.collection("requisicoes")
+    db
+        .collection("requisicoes")
         .document(request.id)
         .setData(request.toMap());
 
-    // salvar requisição ativa
     Map<String, dynamic> activeRequisitionData = {};
     activeRequisitionData["id_requisicao"] = request.id;
     activeRequisitionData["id_usuario"] = passenger.userId;
     activeRequisitionData["status"] = RequestStatus.AGUARDANDO;
 
-    db.collection("requisicao_ativa")
+    db
+        .collection("requisicao_ativa")
         .document(passenger.userId)
         .setData(activeRequisitionData);
 
-    _statusWaiting();
+    if(_streamSubscriptionRequests == null){
+      _addListenerOfRequest(request.id);
+    }
 
   }
 
-  _changeMainButton(String text, Color color, Function function){
-
+  _changeMainButton(String text, Color color, Function function) {
     setState(() {
       _buttonText = text;
       _buttonColor = color;
       _buttonFunction = function;
     });
-
   }
 
-  _uberStatusNotCalled(){
+  _statusNotCalled() {
 
     _showDestinationBox = true;
 
-    _changeMainButton(
-        "Chamar uber",
-        Color(0xff1ebbd8),
-        (){_callUber();}
-    );
+    _changeMainButton("Chamar uber", Color(0xff1ebbd8), () {
+      _callUber();
+    });
 
-    Position position = Position(
-        latitude: _passengerLocal.latitude,
-        longitude: _passengerLocal.longitude
-    );
+    if(_passengerLocal != null){
 
-    _showPassengerMarker(position);
-    CameraPosition cameraPosition = CameraPosition(
-        target: LatLng(position.latitude, position.longitude),
-        zoom: 19
-    );
+      Position position = Position(
+          latitude: _passengerLocal.latitude,
+          longitude: _passengerLocal.longitude
+      );
 
-    _moveCamera(cameraPosition);
+      _showPassengerMarker(position);
+      CameraPosition cameraPosition = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 19
+      );
+
+      _moveCamera(cameraPosition);
+
+    }
 
   }
 
-  _statusWaiting(){
+  _statusWaiting() {
 
     _showDestinationBox = false;
 
-    _changeMainButton(
-        "Cancelar",
-        Colors.red,
-        (){_cancelUber();}
-    );
+    _changeMainButton("Cancelar", Colors.red, () {
+      _cancelUber();
+    });
 
     double passengerLat = _requestData["passageiro"]["latitude"];
     double passengerLon = _requestData["passageiro"]["longitude"];
+
     Position position = Position(
         latitude: passengerLat,
         longitude: passengerLon
     );
 
     _showPassengerMarker(position);
-
     CameraPosition cameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude),
         zoom: 19
     );
 
-    _moveCamera(cameraPosition);
+    _moveCamera( cameraPosition );
 
   }
 
@@ -313,8 +306,99 @@ class _PassengerPageState extends State<PassengerPage> {
     _changeMainButton(
         "Motorista a caminho",
         Colors.grey,
-        () { }
+            () {
+
+        });
+
+    double passengerLat = _requestData["passageiro"]["latitude"];
+    double passengerLon = _requestData["passageiro"]["longitude"];
+
+    double driverLat = _requestData["motorista"]["latitude"];
+    double driverLon = _requestData["motorista"]["longitude"];
+
+    _showTwoMarkers(
+        LatLng(driverLat, driverLon),
+        LatLng(passengerLat, passengerLon)
     );
+
+    var nLat, nLon, sLat, sLon;
+
+    if(driverLat <=  passengerLat){
+      sLat = driverLat;
+      nLat = passengerLat;
+    }else{
+      sLat = passengerLat;
+      nLat = driverLat;
+    }
+
+    if(driverLon <=  passengerLon){
+      sLon = driverLon;
+      nLon = passengerLon;
+    }else{
+      sLon = passengerLon;
+      nLon = driverLon;
+    }
+
+    _moveCameraBounds(
+        LatLngBounds(
+            northeast: LatLng(nLat, nLon),
+            southwest: LatLng(sLat, sLon)
+        )
+    );
+
+  }
+
+  _moveCameraBounds(LatLngBounds latLngBounds) async {
+
+    GoogleMapController googleMapController = await _controller.future;
+    googleMapController
+        .animateCamera(
+        CameraUpdate.newLatLngBounds(
+            latLngBounds,
+            100
+        )
+    );
+
+  }
+
+  _showTwoMarkers(LatLng driverLatLng, LatLng passengerLatLng){
+
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    Set<Marker> _markersList = {};
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "images/motorista.png")
+        .then((BitmapDescriptor icon) {
+
+      Marker marker1 = Marker(
+          markerId: MarkerId("marcador-motorista"),
+          position: LatLng(driverLatLng.latitude, driverLatLng.longitude),
+          infoWindow: InfoWindow(title: "Local motorista"),
+          icon: icon);
+
+      _markersList.add(marker1);
+
+    });
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        "images/passageiro.png")
+        .then((BitmapDescriptor icon) {
+
+      Marker marker2 = Marker(
+          markerId: MarkerId("marcador-passageiro"),
+          position: LatLng(passengerLatLng.latitude, passengerLatLng.longitude),
+          infoWindow: InfoWindow(title: "Local passageiro"),
+          icon: icon);
+
+      _markersList.add(marker2);
+
+    });
+
+    setState(() {
+      _markers = _markersList;
+    });
 
   }
 
@@ -346,14 +430,14 @@ class _PassengerPageState extends State<PassengerPage> {
         .document(firebaseUser.uid)
         .get();
 
-    if( documentSnapshot.data != null ){
+    if(documentSnapshot.data != null){
 
       Map<String, dynamic> data = documentSnapshot.data;
       _requestId = data["id_requisicao"];
       _addListenerOfRequest(_requestId);
 
     }else{
-      _uberStatusNotCalled();
+      _statusNotCalled();
     }
 
   }
@@ -361,43 +445,36 @@ class _PassengerPageState extends State<PassengerPage> {
   _addListenerOfRequest(String requestId) async {
 
     Firestore db = Firestore.instance;
-    await db.collection("requisicoes")
-        .document(requestId)
-        .snapshots()
-        .listen((snapshot){
+    _streamSubscriptionRequests = await db.collection("requisicoes")
+        .document(requestId).snapshots().listen((snapshot){
 
-          if(snapshot.data != null){
+      if(snapshot.data != null){
 
-            Map<String, dynamic> data = snapshot.data;
-            _requestData = data;
+        Map<String, dynamic> data = snapshot.data;
+        _requestData = data;
+        String status = data["status"];
+        _requestId = data["id_requisicao"];
 
-            String status = data["status"];
-            requestId = data["id_requisicao"];
+        switch(status){
+          case RequestStatus.AGUARDANDO :
+            _statusWaiting();
+            break;
+          case RequestStatus.A_CAMINHO :
+            _statusWaiting();
+            break;
+          case RequestStatus.VIAGEM :
 
-            switch(status){
-              case RequestStatus.AGUARDANDO :
-                _statusWaiting();
-                break;
-              case RequestStatus.A_CAMINHO :
-                _statusOnTheWay();
-                break;
-              case RequestStatus.VIAGEM :
+            break;
+          case RequestStatus.FINALIZADA :
 
-                break;
-              case RequestStatus.FINALIZADA :
+            break;
 
-                break;
+        }
 
-            }
+      }
 
-          }
+    });
 
-        });
-
-  }
-
-  _onMapCreated(GoogleMapController controller){
-    _controller.complete(controller);
   }
 
   @override
@@ -533,6 +610,12 @@ class _PassengerPageState extends State<PassengerPage> {
       ),
     );
 
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _streamSubscriptionRequests.cancel();
   }
 
 }
