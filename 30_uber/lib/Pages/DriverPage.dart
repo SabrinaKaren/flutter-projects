@@ -24,12 +24,9 @@ class _DriverPageState extends State<DriverPage> {
   Firestore db = Firestore.instance;
 
   _logoutUser() async {
-
     FirebaseAuth auth = FirebaseAuth.instance;
-
     await auth.signOut();
     Navigator.pushReplacementNamed(context, "/");
-
   }
 
   _choiceOfMenu(String choice){
@@ -39,7 +36,6 @@ class _DriverPageState extends State<DriverPage> {
         _logoutUser();
         break;
       case "Configurações" :
-
         break;
     }
 
@@ -48,7 +44,7 @@ class _DriverPageState extends State<DriverPage> {
   Stream<QuerySnapshot> _addRequestsListener(){
 
     final stream = db.collection("requisicoes")
-        .where("status", isEqualTo: RequestStatus.AGUARDANDO )
+        .where("status", isEqualTo: RequestStatus.AGUARDANDO)
         .snapshots();
 
     stream.listen((data){
@@ -91,7 +87,7 @@ class _DriverPageState extends State<DriverPage> {
   @override
   Widget build(BuildContext context) {
 
-    var loadingMessage = Center(
+    var loadingMsg = Center(
       child: Column(
         children: <Widget>[
           Text("Carregando requisições"),
@@ -100,7 +96,7 @@ class _DriverPageState extends State<DriverPage> {
       ),
     );
 
-    var noHasDataMessage = Center(
+    var msgNoHaveData = Center(
       child: Text(
         "Você não tem nenhuma requisição :( ",
         style: TextStyle(
@@ -135,21 +131,21 @@ class _DriverPageState extends State<DriverPage> {
           stream: _controller.stream,
           // ignore: missing_return
           builder: (context, snapshot){
-            switch( snapshot.connectionState ){
+            switch(snapshot.connectionState){
               case ConnectionState.none:
               case ConnectionState.waiting:
-                return loadingMessage;
+                return loadingMsg;
                 break;
               case ConnectionState.active:
               case ConnectionState.done:
 
-                if( snapshot.hasError ){
+                if(snapshot.hasError){
                   return Text("Erro ao carregar os dados!");
                 }else {
 
                   QuerySnapshot querySnapshot = snapshot.data;
-                  if( querySnapshot.documents.length == 0 ){
-                    return noHasDataMessage;
+                  if(querySnapshot.documents.length == 0){
+                    return msgNoHaveData;
                   }else{
 
                     return ListView.separated(

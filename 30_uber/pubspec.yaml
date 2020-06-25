@@ -28,6 +28,7 @@ dependencies:
   cloud_firestore: ^0.13.6
   google_maps_flutter: ^0.5.20+1
   geolocator: ^5.1.1+1
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,7 @@ flutter:
     - images/logo.png
     - images/motorista.png
     - images/passageiro.png
+    - images/destino.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

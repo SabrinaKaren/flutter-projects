@@ -71,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
     ).then((firebaseUser){
 
       db.collection("usuarios")
-          .document( firebaseUser.user.uid )
+          .document(firebaseUser.user.uid)
           .setData(user.toMap());
 
       switch(user.userType){
@@ -91,6 +91,8 @@ class _RegisterPageState extends State<RegisterPage> {
           break;
       }
 
+    }).catchError((error){
+      _errorMsg = "Erro ao cadastrar usuário, verifique os campos e tente novamente!";
     });
 
   }
@@ -187,7 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _errorMsg,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),

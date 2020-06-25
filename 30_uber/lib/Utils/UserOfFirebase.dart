@@ -41,7 +41,7 @@ class UserOfFirebase{
 
   }
 
-  static updateLocationData(String requestid, double lat, double lon) async {
+  static updateLocationData(String requestId, double lat, double lon) async {
 
     Firestore db = Firestore.instance;
 
@@ -50,7 +50,7 @@ class UserOfFirebase{
     driver.longitude = lon;
 
     db.collection("requisicoes")
-        .document(requestid)
+        .document(requestId)
         .updateData({
       "motorista" : driver.toMap()
     });

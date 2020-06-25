@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:uber/Data/UserData.dart';
 import 'package:uber/Utils/RequestStatus.dart';
 import 'package:uber/Utils/UserOfFirebase.dart';
@@ -71,8 +72,7 @@ class _RunPageState extends State<RunPage> {
                 position.longitude
             );
 
-          } else{
-
+          }else{
 
             setState(() {
               _driverLocal = position;
@@ -86,7 +86,6 @@ class _RunPageState extends State<RunPage> {
       }
 
     });
-
   }
 
   _getLastKnownLocation() async {
@@ -101,9 +100,7 @@ class _RunPageState extends State<RunPage> {
 
   _moveCamera(CameraPosition cameraPosition) async {
     GoogleMapController googleMapController = await _controller.future;
-    googleMapController.animateCamera(
-        CameraUpdate.newCameraPosition(cameraPosition)
-    );
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   _showMarker(Position local, String icon, String infoWindow) async {
@@ -113,7 +110,9 @@ class _RunPageState extends State<RunPage> {
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
         icon
-    ).then((BitmapDescriptor bitmapDescriptor) {
+    )
+        .then((BitmapDescriptor bitmapDescriptor) {
+
       Marker marker = Marker(
           markerId: MarkerId(icon),
           position: LatLng(local.latitude, local.longitude),
@@ -125,6 +124,7 @@ class _RunPageState extends State<RunPage> {
       });
 
     });
+
 
   }
 
@@ -144,7 +144,8 @@ class _RunPageState extends State<RunPage> {
 
     Firestore db = Firestore.instance;
 
-    await db.collection("requisicoes").document(_requestId).snapshots().listen((snapshot){
+    await db.collection("requisicoes")
+        .document(_requestId).snapshots().listen((snapshot){
 
       if(snapshot.data != null){
 
@@ -154,6 +155,7 @@ class _RunPageState extends State<RunPage> {
         _requestStatus = data["status"];
 
         switch(_requestStatus){
+
           case RequestStatus.AGUARDANDO :
             _statusWaiting();
             break;
@@ -161,10 +163,13 @@ class _RunPageState extends State<RunPage> {
             _statusOnTheWay();
             break;
           case RequestStatus.VIAGEM :
-
+            _statusOnTrip();
             break;
           case RequestStatus.FINALIZADA :
-
+            _statusFinished();
+            break;
+          case RequestStatus.CONFIRMADA :
+            _statusConfirmed();
             break;
 
         }
@@ -222,16 +227,17 @@ class _RunPageState extends State<RunPage> {
         }
     );
 
-    double passengerLat = _requestData["passageiro"]["latitude"];
-    double passengerLon = _requestData["passageiro"]["longitude"];
-
     double driverLat = _requestData["motorista"]["latitude"];
     double driverLon = _requestData["motorista"]["longitude"];
+
+    double passengerLat = _requestData["passageiro"]["latitude"];
+    double passengerLon = _requestData["passageiro"]["longitude"];
 
     _showTwoMarkers(
         LatLng(driverLat, driverLon),
         LatLng(passengerLat, passengerLon)
     );
+
     var nLat, nLon, sLat, sLon;
 
     if(driverLat <=  passengerLat){
@@ -246,8 +252,158 @@ class _RunPageState extends State<RunPage> {
       sLon = driverLon;
       nLon = passengerLon;
     }else{
-      sLon = passengerLon;
-      nLon = driverLon;
+      sLon = driverLon;
+      nLon = passengerLon;
+    }
+
+    _moveCameraBounds(
+        LatLngBounds(
+            northeast: LatLng(nLat, nLon),
+            southwest: LatLng(sLat, sLon)
+        )
+    );
+
+  }
+
+  _finishRun(){
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+        .document(_requestId)
+        .updateData({
+      "status" : RequestStatus.FINALIZADA
+    });
+
+    String passengerId = _requestData["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document(passengerId)
+        .updateData({"status": RequestStatus.FINALIZADA });
+
+    String driverId = _requestData["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document(driverId)
+        .updateData({"status": RequestStatus.FINALIZADA });
+
+  }
+
+  _statusFinished() async {
+
+    double originLat = _requestData["origem"]["latitude"];
+    double originLon = _requestData["origem"]["longitude"];
+
+    double destinationLat = _requestData["destino"]["latitude"];
+    double destinationLon = _requestData["destino"]["longitude"];
+
+    double distanceInMeters = await Geolocator().distanceBetween(
+        originLat,
+        originLon,
+        destinationLat,
+        destinationLon
+    );
+
+    // converter para km
+    double distanceInKm = distanceInMeters / 1000;
+
+    // 8 é o valor cobrado por km
+    double tripPrice = distanceInKm * 8;
+
+    // formatando o valor da viagem
+    var f = new NumberFormat("#,##0.00", "pt_BR");
+    var tripPriceFormatted = f.format(tripPrice);
+
+    _statusMsg = "Viagem finalizada";
+    _changeMainButton(
+        "Confirmar - R\$ ${tripPriceFormatted}",
+        Color(0xff1ebbd8),
+            (){
+          _confirmRun();
+        }
+    );
+
+    _markers = {};
+    Position position = Position(
+        latitude: destinationLat, longitude: destinationLon
+    );
+
+    _showMarker(
+        position,
+        "images/destino.png",
+        "Destino"
+    );
+
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 19
+    );
+
+    _moveCamera(cameraPosition);
+
+  }
+
+  _statusConfirmed(){
+    Navigator.pushReplacementNamed(context, "/motorista");
+  }
+
+  _confirmRun(){
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+        .document(_requestId)
+        .updateData({
+      "status" : RequestStatus.CONFIRMADA
+    });
+
+    String passengerId = _requestData["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document(passengerId)
+        .delete();
+
+    String driverId = _requestData["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document(driverId)
+        .delete();
+
+  }
+
+  _statusOnTrip() {
+
+    _statusMsg = "Em viagem";
+
+    _changeMainButton(
+        "Finalizar corrida",
+        Color(0xff1ebbd8),
+            (){
+          _finishRun();
+        }
+    );
+
+    double originLat = _requestData["motorista"]["latitude"];
+    double originLon = _requestData["motorista"]["longitude"];
+
+    double destinationLat = _requestData["destino"]["latitude"];
+    double destinationLon = _requestData["destino"]["longitude"];
+
+    _showTwoMarkers(
+        LatLng(originLat, originLon),
+        LatLng(destinationLat, destinationLon)
+    );
+
+    var nLat, nLon, sLat, sLon;
+
+    if(originLat <=  destinationLat){
+      sLat = originLat;
+      nLat = destinationLat;
+    }else{
+      sLat = destinationLat;
+      nLat = originLat;
+    }
+
+    if(originLon <=  destinationLon){
+      sLon = originLon;
+      nLon = destinationLon;
+    }else{
+      sLon = destinationLon;
+      nLon = originLon;
     }
 
     _moveCameraBounds(
@@ -327,7 +483,6 @@ class _RunPageState extends State<RunPage> {
           position: LatLng(passengerLatLng.latitude, passengerLatLng.longitude),
           infoWindow: InfoWindow(title: "Local passageiro"),
           icon: icon);
-
       _markersList.add(marker2);
 
     });
@@ -341,8 +496,8 @@ class _RunPageState extends State<RunPage> {
   _acceptRun() async {
 
     UserData driver = await UserOfFirebase.getUserLoggedInfo();
-    driver.latitude  = _driverLocal.latitude;
-    driver.longitude = _driverLocal.longitude;
+    driver.latitude = driver.latitude;
+    driver.longitude = driver.longitude;
 
     Firestore db = Firestore.instance;
     String requestId = _requestData["id"];
@@ -385,7 +540,7 @@ class _RunPageState extends State<RunPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Painel corrida" + _statusMsg),
+        title: Text("Painel corrida - " + _statusMsg),
       ),
       body: Container(
         child: Stack(
@@ -394,10 +549,8 @@ class _RunPageState extends State<RunPage> {
               mapType: MapType.normal,
               initialCameraPosition: _cameraPosition,
               onMapCreated: _onMapCreated,
-              //myLocationEnabled: true,
               myLocationButtonEnabled: false,
               markers: _markers,
-              //-23,559200, -46,658878
             ),
             Positioned(
               right: 0,
@@ -414,7 +567,8 @@ class _RunPageState extends State<RunPage> {
                     ),
                     color: _buttonColor,
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: _buttonFunction),
+                    onPressed: _buttonFunction
+                ),
               ),
             )
           ],

@@ -9,7 +9,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:uber/Data/DestinationData.dart';
+import 'package:uber/Data/MarkerData.dart';
 import 'package:uber/Data/RequestData.dart';
 import 'package:uber/Data/UserData.dart';
 import 'package:uber/Utils/RequestStatus.dart';
@@ -30,7 +32,7 @@ class _PassengerPageState extends State<PassengerPage> {
       target: LatLng(-19.931824, -43.935333)
   );
   Set<Marker> _markers = {};
-  TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162" );
+  TextEditingController _controllerDestination  = TextEditingController(text: "av. Bias Fortes, 162");
   String _requestId;
   Position _passengerLocal;
   Map<String, dynamic> _requestData;
@@ -77,13 +79,11 @@ class _PassengerPageState extends State<PassengerPage> {
             position.longitude
         );
 
-      } else{
-
+      }else{
         setState(() {
           _passengerLocal = position;
         });
         _statusNotCalled();
-
       }
 
     });
@@ -111,7 +111,6 @@ class _PassengerPageState extends State<PassengerPage> {
       }
 
     });
-
   }
 
   _moveCamera(CameraPosition cameraPosition) async {
@@ -163,18 +162,18 @@ class _PassengerPageState extends State<PassengerPage> {
         destination.latitude = address.position.latitude;
         destination.longitude = address.position.longitude;
 
-        String addressVerification;
-        addressVerification = "\n Cidade: " + destination.city;
-        addressVerification += "\n Rua: " + destination.street + ", " + destination.number;
-        addressVerification += "\n Bairro: " + destination.neighborhood;
-        addressVerification += "\n Cep: " + destination.cep;
+        String addressConfirmation;
+        addressConfirmation = "\n Cidade: " + destination.city;
+        addressConfirmation += "\n Rua: " + destination.street + ", " + destination.number;
+        addressConfirmation += "\n Bairro: " + destination.neighborhood;
+        addressConfirmation += "\n Cep: " + destination.cep;
 
         showDialog(
             context: context,
             builder: (contex) {
               return AlertDialog(
                 title: Text("Confirmação do endereço"),
-                content: Text(addressVerification),
+                content: Text(addressConfirmation),
                 contentPadding: EdgeInsets.all(16),
                 actions: <Widget>[
                   FlatButton(
@@ -190,7 +189,7 @@ class _PassengerPageState extends State<PassengerPage> {
                       style: TextStyle(color: Colors.green),
                     ),
                     onPressed: () {
-                      _saveResquest(destination);
+                      _saveRequest(destination);
                       Navigator.pop(contex);
                     },
                   )
@@ -204,7 +203,7 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
-  _saveResquest(DestinationData destination) async {
+  _saveRequest(DestinationData destination) async {
 
     UserData passenger = await UserOfFirebase.getUserLoggedInfo();
     passenger.latitude = _passengerLocal.latitude;
@@ -262,6 +261,7 @@ class _PassengerPageState extends State<PassengerPage> {
       );
 
       _showPassengerMarker(position);
+
       CameraPosition cameraPosition = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
           zoom: 19
@@ -283,19 +283,19 @@ class _PassengerPageState extends State<PassengerPage> {
 
     double passengerLat = _requestData["passageiro"]["latitude"];
     double passengerLon = _requestData["passageiro"]["longitude"];
-
     Position position = Position(
         latitude: passengerLat,
         longitude: passengerLon
     );
 
     _showPassengerMarker(position);
+
     CameraPosition cameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude),
         zoom: 19
     );
 
-    _moveCamera( cameraPosition );
+    _moveCamera(cameraPosition);
 
   }
 
@@ -310,33 +310,89 @@ class _PassengerPageState extends State<PassengerPage> {
 
         });
 
-    double passengerLat = _requestData["passageiro"]["latitude"];
-    double passengerLon = _requestData["passageiro"]["longitude"];
+    double originLat = _requestData["motorista"]["latitude"];
+    double originLon = _requestData["motorista"]["longitude"];
 
-    double driverLat = _requestData["motorista"]["latitude"];
-    double driverLon = _requestData["motorista"]["longitude"];
+    double destinationLat = _requestData["passageiro"]["latitude"];
+    double destinationLon = _requestData["passageiro"]["longitude"];
+
+    MarkerData originMarker = MarkerData(
+        LatLng(originLat, originLon),
+        "images/motorista.png",
+        "Local motorista"
+    );
+
+    MarkerData destinationMarker = MarkerData(
+        LatLng(destinationLat, destinationLon),
+        "images/passageiro.png",
+        "Local destino"
+    );
+
+    _showAndCenterTwoMarkers(originMarker, destinationMarker);
+
+  }
+
+  _statusOnTrip() {
+
+    _showDestinationBox = false;
+
+    _changeMainButton(
+        "Em viagem",
+        Colors.grey,
+        null
+    );
+
+    double originLat = _requestData["motorista"]["latitude"];
+    double originLon = _requestData["motorista"]["longitude"];
+
+    double destinationLat = _requestData["destino"]["latitude"];
+    double destinationLon = _requestData["destino"]["longitude"];
+
+    MarkerData originMarker = MarkerData(
+        LatLng(originLat, originLon),
+        "images/motorista.png",
+        "Local motorista"
+    );
+
+    MarkerData destinationMarker = MarkerData(
+        LatLng(destinationLat, destinationLon),
+        "images/destino.png",
+        "Local destino"
+    );
+
+    _showAndCenterTwoMarkers(originMarker, destinationMarker);
+
+  }
+
+  _showAndCenterTwoMarkers(MarkerData originMarker, MarkerData destinationMarker){
+
+    double originLat = originMarker.local.latitude;
+    double originLon = originMarker.local.longitude;
+
+    double destinationLat = destinationMarker.local.latitude;
+    double destinationLon = destinationMarker.local.longitude;
 
     _showTwoMarkers(
-        LatLng(driverLat, driverLon),
-        LatLng(passengerLat, passengerLon)
+        originMarker,
+        destinationMarker
     );
 
     var nLat, nLon, sLat, sLon;
 
-    if(driverLat <=  passengerLat){
-      sLat = driverLat;
-      nLat = passengerLat;
+    if(originLat <=  destinationLat){
+      sLat = originLat;
+      nLat = destinationLat;
     }else{
-      sLat = passengerLat;
-      nLat = driverLat;
+      sLat = destinationLat;
+      nLat = originLat;
     }
 
-    if(driverLon <=  passengerLon){
-      sLon = driverLon;
-      nLon = passengerLon;
+    if(originLon <=  destinationLon){
+      sLon = originLon;
+      nLon = destinationLon;
     }else{
-      sLon = passengerLon;
-      nLon = driverLon;
+      sLon = destinationLon;
+      nLon = originLon;
     }
 
     _moveCameraBounds(
@@ -345,6 +401,96 @@ class _PassengerPageState extends State<PassengerPage> {
             southwest: LatLng(sLat, sLon)
         )
     );
+
+  }
+
+  _statusFinished() async {
+
+    double destinationLat = _requestData["destino"]["latitude"];
+    double destinationLon = _requestData["destino"]["longitude"];
+
+    double originLat = _requestData["origem"]["latitude"];
+    double originLon = _requestData["origem"]["longitude"];
+
+    double distanceInMeters = await Geolocator().distanceBetween(
+        originLat,
+        originLon,
+        destinationLat,
+        destinationLon
+    );
+
+    // converter para km
+    double distanceInKm = distanceInMeters / 1000;
+
+    // 8 é o valor cobrado por km
+    double tripPrice = distanceInKm * 8;
+
+    // formatando o valor da viagem
+    var f = new NumberFormat("#,##0.00", "pt_BR");
+    var tripPriceFormatted = f.format(tripPrice);
+
+    _changeMainButton(
+        "Total - R\$ ${tripPriceFormatted}",
+        Colors.green,
+            (){}
+    );
+
+    _markers = {};
+    Position position = Position(
+        latitude: destinationLat, longitude: destinationLon
+    );
+
+    _showMarker(
+        position,
+        "images/destino.png",
+        "Destino"
+    );
+
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 19
+    );
+
+    _moveCamera(cameraPosition);
+
+  }
+
+  _statusConfirmed(){
+
+    if(_streamSubscriptionRequests != null)
+      _streamSubscriptionRequests.cancel();
+
+    _showDestinationBox = true;
+
+    _changeMainButton(
+        "Chamar uber",
+        Color(0xff1ebbd8), () {
+      _callUber();
+    });
+
+    _requestData = {};
+
+  }
+
+  _showMarker(Position local, String icon, String infoWindow) async {
+
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: pixelRatio),
+        icon)
+        .then((BitmapDescriptor bitmapDescriptor) {
+
+      Marker marker = Marker(
+          markerId: MarkerId(icon),
+          position: LatLng(local.latitude, local.longitude),
+          infoWindow: InfoWindow(title: infoWindow),
+          icon: bitmapDescriptor);
+
+      setState(() {
+        _markers.add(marker);
+      });
+    });
 
   }
 
@@ -361,38 +507,40 @@ class _PassengerPageState extends State<PassengerPage> {
 
   }
 
-  _showTwoMarkers(LatLng driverLatLng, LatLng passengerLatLng){
+  _showTwoMarkers(MarkerData originMarker, MarkerData destinationMarker){
 
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
+    LatLng originLatLng = originMarker.local;
+    LatLng destinationLatLng = destinationMarker.local;
+
     Set<Marker> _markersList = {};
+
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
-        "images/motorista.png")
+        originMarker.imagePath)
         .then((BitmapDescriptor icon) {
 
-      Marker marker1 = Marker(
-          markerId: MarkerId("marcador-motorista"),
-          position: LatLng(driverLatLng.latitude, driverLatLng.longitude),
-          infoWindow: InfoWindow(title: "Local motorista"),
+      Marker origin = Marker(
+          markerId: MarkerId(originMarker.imagePath),
+          position: LatLng(originLatLng.latitude, originLatLng.longitude),
+          infoWindow: InfoWindow(title: originMarker.title),
           icon: icon);
-
-      _markersList.add(marker1);
+      _markersList.add(origin);
 
     });
 
     BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: pixelRatio),
-        "images/passageiro.png")
+        destinationMarker.imagePath)
         .then((BitmapDescriptor icon) {
 
-      Marker marker2 = Marker(
-          markerId: MarkerId("marcador-passageiro"),
-          position: LatLng(passengerLatLng.latitude, passengerLatLng.longitude),
-          infoWindow: InfoWindow(title: "Local passageiro"),
+      Marker destination = Marker(
+          markerId: MarkerId(destinationMarker.imagePath),
+          position: LatLng(destinationLatLng.latitude, destinationLatLng.longitude),
+          infoWindow: InfoWindow(title: destinationMarker.title),
           icon: icon);
-
-      _markersList.add(marker2);
+      _markersList.add(destination);
 
     });
 
@@ -413,7 +561,7 @@ class _PassengerPageState extends State<PassengerPage> {
     }).then((_){
 
       db.collection("requisicao_ativa")
-          .document( firebaseUser.uid )
+          .document(firebaseUser.uid)
           .delete();
 
     });
@@ -456,17 +604,21 @@ class _PassengerPageState extends State<PassengerPage> {
         _requestId = data["id_requisicao"];
 
         switch(status){
+
           case RequestStatus.AGUARDANDO :
             _statusWaiting();
             break;
           case RequestStatus.A_CAMINHO :
-            _statusWaiting();
+            _statusOnTheWay();
             break;
           case RequestStatus.VIAGEM :
-
+            _statusOnTrip();
             break;
           case RequestStatus.FINALIZADA :
-
+            _statusFinished();
+            break;
+          case RequestStatus.CONFIRMADA :
+            _statusConfirmed();
             break;
 
         }
@@ -493,17 +645,13 @@ class _PassengerPageState extends State<PassengerPage> {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: _choiceOfMenu,
-            itemBuilder: (context){
-
-              return menuItems.map((String item){
-
+            itemBuilder: (context) {
+              return menuItems.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,
                   child: Text(item),
                 );
-
               }).toList();
-
             },
           )
         ],
@@ -515,7 +663,6 @@ class _PassengerPageState extends State<PassengerPage> {
               mapType: MapType.normal,
               initialCameraPosition: _cameraPosition,
               onMapCreated: _onMapCreated,
-              //myLocationEnabled: true,
               myLocationButtonEnabled: false,
               markers: _markers,
             ),
@@ -535,8 +682,7 @@ class _PassengerPageState extends State<PassengerPage> {
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey),
                             borderRadius: BorderRadius.circular(3),
-                            color: Colors.white
-                        ),
+                            color: Colors.white),
                         child: TextField(
                           readOnly: true,
                           decoration: InputDecoration(
@@ -544,12 +690,15 @@ class _PassengerPageState extends State<PassengerPage> {
                                 margin: EdgeInsets.only(left: 20),
                                 width: 10,
                                 height: 10,
-                                child: Icon(Icons.location_on, color: Colors.green,),
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: Colors.green,
+                                ),
                               ),
                               hintText: "Meu local",
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 15, top: 16)
-                          ),
+                              contentPadding:
+                              EdgeInsets.only(left: 15, top: 16)),
                         ),
                       ),
                     ),
@@ -566,8 +715,7 @@ class _PassengerPageState extends State<PassengerPage> {
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey),
                             borderRadius: BorderRadius.circular(3),
-                            color: Colors.white
-                        ),
+                            color: Colors.white),
                         child: TextField(
                           controller: _controllerDestination,
                           decoration: InputDecoration(
@@ -575,16 +723,19 @@ class _PassengerPageState extends State<PassengerPage> {
                                 margin: EdgeInsets.only(left: 20),
                                 width: 10,
                                 height: 10,
-                                child: Icon(Icons.local_taxi, color: Colors.black,),
+                                child: Icon(
+                                  Icons.local_taxi,
+                                  color: Colors.black,
+                                ),
                               ),
                               hintText: "Digite o destino",
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 15, top: 16)
-                          ),
+                              contentPadding:
+                              EdgeInsets.only(left: 15, top: 16)),
                         ),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -601,7 +752,7 @@ class _PassengerPageState extends State<PassengerPage> {
                     ),
                     color: _buttonColor,
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    onPressed: _buttonFunction,
+                    onPressed: _buttonFunction
                 ),
               ),
             )

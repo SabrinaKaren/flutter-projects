@@ -61,9 +61,7 @@ class _HomePageState extends State<HomePage> {
         email: user.email,
         password: user.password
     ).then((firebaseUser){
-
       _redirectsByUserType(firebaseUser.user.uid);
-
     }).catchError((error){
       _errorMsg = "Erro ao autenticar usuário, verifique e-mail e senha e tente novamente!";
     });
@@ -100,9 +98,9 @@ class _HomePageState extends State<HomePage> {
 
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    FirebaseUser loggedUser = await auth.currentUser();
-    if(loggedUser != null){
-      String userId = loggedUser.uid;
+    FirebaseUser userLogged = await auth.currentUser();
+    if(userLogged != null){
+      String userId = userLogged.uid;
       _redirectsByUserType(userId);
     }
 
@@ -116,7 +114,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -201,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
                     child: Text(
-                      "Erro",
+                      _errorMsg,
                       style: TextStyle(color: Colors.red, fontSize: 20),
                     ),
                   ),
@@ -212,7 +209,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-
   }
 
 }
