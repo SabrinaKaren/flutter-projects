@@ -16,27 +16,74 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        AnimatedContainer(
-          padding: EdgeInsets.all(20),
-          width: _status ? 200 : 300 ,
-          height: _status ? 300 : 200,
-          color: _status ? Colors.white : Colors.purpleAccent,
-          child: Image.asset("images/logo.png"),
-          duration: Duration(seconds: 2),
-          curve: Curves.elasticInOut,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          "Animações",
+          style: TextStyle(
+              color: Colors.blue
+          ),
         ),
-        RaisedButton(
-          child: Text("Alterar"),
-          onPressed: (){
+        backgroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: GestureDetector(
+          onTap: (){
             setState(() {
               _status = !_status;
             });
           },
-        )
-      ],
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.linear,
+            alignment: Alignment.center,
+            width: _status ? 60 : 160 ,
+            height: 60,
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(30)
+            ),
+            child: Stack(children: <Widget>[
+              Align(
+                alignment: Alignment.center,
+                child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 100),
+                  opacity: _status ? 1 : 0 ,
+                  child: Icon(Icons.person_add, color: Colors.white,),
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 100),
+                  opacity: _status ? 0 : 1 ,
+                  child: Text(
+                    "Mensagem",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20
+                    ),
+                  ),
+                ),
+              )
+            ],),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.white,
+        elevation: 30,
+        child: Icon(Icons.play_arrow),
+        onPressed: (){
+          setState(() {
+            _status = !_status;
+          });
+        },
+      ),
     );
 
   }
