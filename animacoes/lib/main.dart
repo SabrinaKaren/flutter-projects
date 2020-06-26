@@ -2,8 +2,7 @@
   Sabrina Karen
 */
 
-
-import 'package:animacoes/aplications/Aplication7.dart';
+import 'package:animacoes/HomePage.dart';
 import 'package:flutter/material.dart';
 
 void main(){

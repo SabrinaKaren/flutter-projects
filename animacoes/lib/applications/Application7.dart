@@ -1,6 +1,6 @@
 /*
   Sabrina Karen
-  Desc.: aplicando filtro dinâmico em imagem
+  Desc.:
 */
 
 import 'package:flutter/material.dart';
