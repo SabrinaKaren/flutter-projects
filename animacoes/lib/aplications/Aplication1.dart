@@ -1,5 +1,6 @@
 /*
   Sabrina Karen
+  Desc.: mudando o tamanho e a cor de um container com uma imagem
 */
 
 import 'package:flutter/material.dart';

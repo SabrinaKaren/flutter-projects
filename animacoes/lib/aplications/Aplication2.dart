@@ -1,5 +1,6 @@
 /*
   Sabrina Karen
+  Desc.: usando animações para fazer um avião "voar"
 */
 
 import 'package:flutter/material.dart';

@@ -17,7 +17,19 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold();
+    return Center(
+      child: TweenAnimationBuilder(
+        duration: Duration(seconds: 2),
+        tween: color,
+        child: Image.asset("images/estrelas.jpg"),
+        builder: (BuildContext context, Color cor, Widget widget){
+          return ColorFiltered(
+            colorFilter: ColorFilter.mode(cor, BlendMode.overlay),
+            child: widget,
+          );
+        },
+      ),
+    );
 
   }
 
