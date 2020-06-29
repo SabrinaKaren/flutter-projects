@@ -3,7 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:olx/HomePage.dart';
+import 'package:olx/pages/HomePage.dart';
 
 final ThemeData defaultTheme = ThemeData(
     primaryColor: Color(0xff9c27b0),
