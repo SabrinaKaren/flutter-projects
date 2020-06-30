@@ -11,16 +11,28 @@ class UserData {
 
   UserData();
 
+  String get userId => _userId;
+
+  set userId(String value) {
+    _userId = value;
+  }
+
   Map<String, dynamic> toMap(){
 
     Map<String, dynamic> map = {
-      "idUsuario"   : this._userId,
+      "idUsuario"   : this.userId,
       "nome"        : this.name,
-      "email"       : this._password
+      "email"       : this.email
     };
 
     return map;
 
+  }
+
+  String get name => _name;
+
+  set name(String value) {
+    _name = value;
   }
 
   String get password => _password;
@@ -33,18 +45,6 @@ class UserData {
 
   set email(String value) {
     _email = value;
-  }
-
-  String get name => _name;
-
-  set name(String value) {
-    _name = value;
-  }
-
-  String get userId => _userId;
-
-  set userId(String value) {
-    _userId = value;
   }
 
 }
