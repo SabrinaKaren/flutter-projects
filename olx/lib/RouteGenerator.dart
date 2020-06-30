@@ -16,7 +16,7 @@ class RouteGenerator {
 
     final args = settings.arguments;
 
-    switch( settings.name ){
+    switch(settings.name){
       case "/" :
         return MaterialPageRoute(
           builder: (_) => AdsPage()

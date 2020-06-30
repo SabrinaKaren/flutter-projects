@@ -86,7 +86,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
         foregroundColor: Colors.white,
         icon: Icon(Icons.add),
         label: Text("Adicionar"),
-        //child: Icon(Icons.add),
         onPressed: () {
           Navigator.pushNamed(context, "/novo-anuncio");
         },

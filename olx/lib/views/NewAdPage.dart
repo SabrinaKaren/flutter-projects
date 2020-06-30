@@ -160,7 +160,7 @@ class _NewAdPageState extends State<NewAdPage> {
                           height: 100,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: _photosList.length + 1, //3
+                              itemCount: _photosList.length + 1,
                               itemBuilder: (context, index) {
                                 if (index == _photosList.length) {
                                   return Padding(

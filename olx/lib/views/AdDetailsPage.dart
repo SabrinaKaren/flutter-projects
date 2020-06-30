@@ -33,7 +33,8 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
         decoration: BoxDecoration(
             image: DecorationImage(
                 image: NetworkImage(url),
-                fit: BoxFit.fitWidth)
+                fit: BoxFit.fitWidth
+            )
         ),
       );
     }).toList();
@@ -45,7 +46,6 @@ class _AdDetailsPageState extends State<AdDetailsPage> {
     if (await canLaunch("tel:$phone")) {
       await launch("tel:$phone");
     } else {
-
     }
 
   }

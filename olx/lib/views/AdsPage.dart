@@ -22,7 +22,7 @@ class _AdsPageState extends State<AdsPage> {
   List<String> menuItems = [];
   List<DropdownMenuItem<String>> _categoriesList;
   List<DropdownMenuItem<String>> _statesList;
-  final _controler = StreamController<QuerySnapshot>.broadcast();
+  final _controller = StreamController<QuerySnapshot>.broadcast();
   String _stateSelected;
   String _categorySelected;
 
@@ -74,7 +74,7 @@ class _AdsPageState extends State<AdsPage> {
     Stream<QuerySnapshot> stream = db.collection("anuncios").snapshots();
 
     stream.listen((data) {
-      _controler.add(data);
+      _controller.add(data);
     });
 
   }
@@ -93,7 +93,7 @@ class _AdsPageState extends State<AdsPage> {
 
     Stream<QuerySnapshot> stream = query.snapshots();
     stream.listen((data) {
-      _controler.add(data);
+      _controller.add(data);
     });
 
   }
@@ -187,7 +187,7 @@ class _AdsPageState extends State<AdsPage> {
               ],
             ),
             StreamBuilder(
-              stream: _controler.stream,
+              stream: _controller.stream,
               builder: (context, snapshot) {
 
                 switch (snapshot.connectionState) {
@@ -203,7 +203,7 @@ class _AdsPageState extends State<AdsPage> {
                       return Container(
                         padding: EdgeInsets.all(25),
                         child: Text(
-                          "Nenhum anúncio! :( ",
+                          "Nenhum anúncio!",
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold
