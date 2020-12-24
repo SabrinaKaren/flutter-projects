@@ -3,11 +3,11 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:getwhatsapp/HomePage.dart';
+import 'package:getwhatsapp/home_page/home_view.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: HomePage(),
+    home: HomeView(),
   ));
 }
