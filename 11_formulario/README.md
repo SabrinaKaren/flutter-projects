@@ -1,3 +1,3 @@
 # formulario
 
-An application that calculates BMI by entering weight and height.
+An application that calculates ICM by entering weight and height.
