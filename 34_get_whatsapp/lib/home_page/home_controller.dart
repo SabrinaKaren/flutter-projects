@@ -4,7 +4,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 class HomeController extends ChangeNotifier {
