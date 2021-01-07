@@ -3,7 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:getwhatsapp/home_page/home_bloc.dart';
+import 'home_bloc.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -34,6 +34,7 @@ class _HomeViewState extends State<HomeView> {
                 controller: _bloc.numberController,
                 cursorColor: Color(0xff075e54),
                 keyboardType: TextInputType.numberWithOptions(),
+                autofocus: true,
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(screenHeight * 0.022),
                   hintText: '(31) 9 9999-9999',
@@ -75,16 +76,21 @@ class _HomeViewState extends State<HomeView> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: screenHeight * 0.05),
-                child: InkWell(
-                  child: Text(
-                    _bloc.link,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: screenHeight * 0.03,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                  onTap: () => _bloc.launchLink(),
+                child: StreamBuilder(
+                  stream: _bloc.outputLink,
+                  builder: (context, snapshot) {
+                    return InkWell(
+                      child: Text(
+                        _bloc.link,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: screenHeight * 0.03,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      onTap: () => _bloc.launchLink(),
+                    );
+                  },
                 ),
               ),
             ],
@@ -93,6 +99,12 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
 
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bloc.dispose();
   }
 
 }
