@@ -1,3 +1,3 @@
 # listadetarefas
 
-A task list app using shared_preferences.
+A task list app using path_provider.
