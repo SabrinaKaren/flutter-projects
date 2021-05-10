@@ -40,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Text(
                     'Pressione',
                   ),
-                  onPressed: () => _homeController.increment(),
+                  onPressed: () => _homeController.doIncrement(),
                 ),
               ],
             ),

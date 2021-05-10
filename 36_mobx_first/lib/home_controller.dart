@@ -3,10 +3,21 @@
 */
 
 import 'package:mobx/mobx.dart';
+part 'home_controller.g.dart';
 
-class HomeController {
+class HomeController = HomeControllerBase with _$HomeController;
+
+abstract class HomeControllerBase with Store {
+
+  @observable
+  int counter = 0;
+
+  @action
+  doIncrement() {
+    counter++;
+  }
   
-  var _counter = Observable(0);
+  /*var _counter = Observable(0);
   Action increment;
 
   HomeController() {
@@ -18,6 +29,6 @@ class HomeController {
 
   _doIncrement() {
     counter++;
-  }
+  }*/
   
 }
