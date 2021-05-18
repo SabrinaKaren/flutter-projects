@@ -3,6 +3,7 @@
 */
 
 import 'package:mobx/mobx.dart';
+import 'package:mobx_login/home/item_controller.dart';
 part 'home_controller.g.dart';
 
 class HomeController = HomeControllerBase with _$HomeController;
@@ -15,11 +16,11 @@ abstract class HomeControllerBase with Store {
   @action
   void addNewItem(String value) => newItem = value;
 
-  ObservableList<String> taskList = ObservableList();
+  ObservableList<ItemController> taskList = ObservableList<ItemController>();
 
   @action
   void addItemInList() {
-    taskList.add(newItem);
+    taskList.add(ItemController(newItem));
     print(taskList);
   }
 

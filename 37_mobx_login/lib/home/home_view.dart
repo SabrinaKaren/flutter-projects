@@ -44,6 +44,7 @@ class _HomeViewState extends State<HomeView> {
               TextButton(
                   onPressed: () {
                     _homeController.addItemInList();
+                    Navigator.pop(context);
                   },
                   child: Text("Salvar")
               )
@@ -68,12 +69,29 @@ class _HomeViewState extends State<HomeView> {
           return ListView.builder(
             itemCount: _homeController.taskList.length,
             itemBuilder: (_, index) {
-              return ListTile(
-                title: Text(_homeController.taskList[index]),
-                onTap: () {
 
+              var item= _homeController.taskList[index];
+
+              return Observer(
+                builder: (_) {
+                  return ListTile(
+                    title: Text(
+                      item.title,
+                      style: TextStyle(
+                        decoration: item.status ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    leading: Checkbox(
+                      value: item.status,
+                      onChanged: item.changeStatus,
+                    ),
+                    onTap: () {
+                      item.status = !item.status;
+                    },
+                  );
                 },
               );
+
             },
           );
         }
