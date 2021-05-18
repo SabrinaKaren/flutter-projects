@@ -5,16 +5,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'home_controller.dart';
+import 'package:mobx_login/home/home_view.dart';
+import 'login_controller.dart';
 
-class HomeView extends StatefulWidget {
+class LoginView extends StatefulWidget {
   @override
-  _HomeViewState createState() => _HomeViewState();
+  _LoginViewState createState() => _LoginViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _LoginViewState extends State<LoginView> {
 
-  HomeController _homeController = HomeController();
+  LoginController _loginController = LoginController();
   ReactionDisposer _reactionDisposer;
 
   @override
@@ -23,13 +24,17 @@ class _HomeViewState extends State<HomeView> {
     super.didChangeDependencies();
 
     /*autorun((_) {
-      print(_homeController.formIsValid);
+      print(_loginController.formIsValid);
     });*/
 
     _reactionDisposer = reaction(
-      (_) => _homeController.userIsLogged,
+      (_) => _loginController.userIsLogged,
       (value) {
-        print(value);
+        if (value) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => HomeView())
+          );
+        }
       }
     );
 
@@ -60,7 +65,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         isDense: true,
                       ),
-                      onChanged: _homeController.setEmail,
+                      onChanged: _loginController.setEmail,
                     ),
                   ),
                   Padding(
@@ -76,7 +81,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         isDense: true,
                       ),
-                      onChanged: _homeController.setPassword,
+                      onChanged: _loginController.setPassword,
                     ),
                   ),
                   Padding(
@@ -84,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
                     child: Observer(
                       builder: (_) {
                         return Text(
-                          _homeController.formIsValid ? "Validado" : "* Campos não validados: ",
+                          _loginController.formIsValid ? "Validado" : "* Campos não validados: ",
                           style: TextStyle(
                             fontSize: 18,
                           ),
@@ -95,10 +100,10 @@ class _HomeViewState extends State<HomeView> {
                   Observer(
                     builder: (_) {
                       return ElevatedButton(
-                        child: _homeController.loading
+                        child: _loginController.loading
                             ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
                             : Text('Logar'),
-                        onPressed: _homeController.formIsValid ? () {_homeController.doLogin();} : null,
+                        onPressed: _loginController.formIsValid ? () {_loginController.doLogin();} : null,
                       );
                     },
                   ),

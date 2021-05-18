@@ -3,13 +3,13 @@
 */
 
 import 'package:mobx/mobx.dart';
-part 'home_controller.g.dart';
+part 'login_controller.g.dart';
 
-class HomeController = HomeControllerBase with _$HomeController;
+class LoginController = LoginControllerBase with _$LoginController;
 
-abstract class HomeControllerBase with Store {
+abstract class LoginControllerBase with Store {
 
-  HomeControllerBase() {
+  LoginControllerBase() {
     autorun((_) {
       /*print(email);
       print(password);*/

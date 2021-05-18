@@ -3,11 +3,11 @@
 */
 
 import 'package:flutter/material.dart';
-import 'home_view.dart';
+import 'login/login_view.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: HomeView(),
+    home: LoginView(),
   ));
 }
