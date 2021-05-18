@@ -54,6 +54,43 @@ mixin _$HomeController on HomeControllerBase, Store {
     });
   }
 
+  final _$userIsLoggedAtom = Atom(name: 'HomeControllerBase.userIsLogged');
+
+  @override
+  bool get userIsLogged {
+    _$userIsLoggedAtom.reportRead();
+    return super.userIsLogged;
+  }
+
+  @override
+  set userIsLogged(bool value) {
+    _$userIsLoggedAtom.reportWrite(value, super.userIsLogged, () {
+      super.userIsLogged = value;
+    });
+  }
+
+  final _$loadingAtom = Atom(name: 'HomeControllerBase.loading');
+
+  @override
+  bool get loading {
+    _$loadingAtom.reportRead();
+    return super.loading;
+  }
+
+  @override
+  set loading(bool value) {
+    _$loadingAtom.reportWrite(value, super.loading, () {
+      super.loading = value;
+    });
+  }
+
+  final _$doLoginAsyncAction = AsyncAction('HomeControllerBase.doLogin');
+
+  @override
+  Future<void> doLogin() {
+    return _$doLoginAsyncAction.run(() => super.doLogin());
+  }
+
   final _$HomeControllerBaseActionController =
       ActionController(name: 'HomeControllerBase');
 
@@ -84,6 +121,8 @@ mixin _$HomeController on HomeControllerBase, Store {
     return '''
 email: ${email},
 password: ${password},
+userIsLogged: ${userIsLogged},
+loading: ${loading},
 emailAndPassword: ${emailAndPassword},
 formIsValid: ${formIsValid}
     ''';

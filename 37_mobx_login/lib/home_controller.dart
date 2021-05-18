@@ -11,8 +11,8 @@ abstract class HomeControllerBase with Store {
 
   HomeControllerBase() {
     autorun((_) {
-      print(email);
-      print(password);
+      /*print(email);
+      print(password);*/
     });
   }
 
@@ -26,12 +26,28 @@ abstract class HomeControllerBase with Store {
   String get emailAndPassword => "$email - $password";
 
   @computed
-  bool get formIsValid => email.length >= 5 && password.length >= 3;
+  bool get formIsValid => email.length >= 4 && password.length >= 4;
+
+  @observable
+  bool userIsLogged = false;
+
+  @observable
+  bool loading = false;
 
   @action
   void setEmail(value) => email = value;
 
   @action
   void setPassword(value) => password = value;
+
+  @action
+  Future<void> doLogin() async {
+
+    loading = true;
+    await Future.delayed(Duration(seconds: 3));
+    loading = false;
+    userIsLogged = true;
+
+  }
   
 }

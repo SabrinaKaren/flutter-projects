@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'home_controller.dart';
 
 class HomeView extends StatefulWidget {
@@ -14,6 +15,25 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
 
   HomeController _homeController = HomeController();
+  ReactionDisposer _reactionDisposer;
+
+  @override
+  void didChangeDependencies() {
+
+    super.didChangeDependencies();
+
+    /*autorun((_) {
+      print(_homeController.formIsValid);
+    });*/
+
+    _reactionDisposer = reaction(
+      (_) => _homeController.userIsLogged,
+      (value) {
+        print(value);
+      }
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +95,10 @@ class _HomeViewState extends State<HomeView> {
                   Observer(
                     builder: (_) {
                       return ElevatedButton(
-                        child: Text(
-                          'Logar',
-                        ),
-                        onPressed: _homeController.formIsValid ? () {} : null,
+                        child: _homeController.loading
+                            ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
+                            : Text('Logar'),
+                        onPressed: _homeController.formIsValid ? () {_homeController.doLogin();} : null,
                       );
                     },
                   ),
@@ -91,6 +111,12 @@ class _HomeViewState extends State<HomeView> {
       onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
     );
 
+  }
+
+  @override
+  void dispose() {
+    _reactionDisposer();
+    super.dispose();
   }
 
 }
