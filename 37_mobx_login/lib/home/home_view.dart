@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx_login/home/home_controller.dart';
+import 'package:mobx_login/login/login_controller.dart';
+import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -57,10 +59,12 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
 
+    final loginController = Provider.of<LoginController>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Tarefas",
+          loginController.email,
           style: TextStyle(fontSize: 25, color: Colors.white),
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:mobx_login/home/home_view.dart';
+import 'package:provider/provider.dart';
 import 'login_controller.dart';
 
 class LoginView extends StatefulWidget {
@@ -15,7 +16,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
 
-  LoginController _loginController = LoginController();
+  LoginController _loginController;
   ReactionDisposer _reactionDisposer;
 
   @override
@@ -26,6 +27,8 @@ class _LoginViewState extends State<LoginView> {
     /*autorun((_) {
       print(_loginController.formIsValid);
     });*/
+
+    _loginController = Provider.of<LoginController>(context);
 
     _reactionDisposer = reaction(
       (_) => _loginController.userIsLogged,
