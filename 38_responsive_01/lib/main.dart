@@ -3,7 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:responsive_01/pages/home/home_page.dart';
+import 'package:responsive_01/app/pages/home/home_page.dart';
 
 void main() {
   runApp(

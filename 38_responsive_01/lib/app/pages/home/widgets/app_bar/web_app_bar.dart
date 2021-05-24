@@ -3,7 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:responsive_01/pages/home/widgets/app_bar/web_app_bar_responsive_content.dart';
+import 'package:responsive_01/app/pages/home/widgets/app_bar/web_app_bar_responsive_content.dart';
 
 class WebAppBar extends StatelessWidget {
 
