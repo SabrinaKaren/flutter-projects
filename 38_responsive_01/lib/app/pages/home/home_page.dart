@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_01/app/pages/home/widgets/app_bar/mobile_app_bar.dart';
 import 'package:responsive_01/app/pages/home/widgets/app_bar/web_app_bar.dart';
+import 'package:responsive_01/app/pages/home/widgets/sections/advantages_section.dart';
+import 'package:responsive_01/app/pages/home/widgets/sections/courses_section.dart';
 import 'package:responsive_01/app/pages/home/widgets/sections/top_section.dart';
 import 'package:responsive_01/app/shared/breakpoints.dart';
 
@@ -28,6 +30,8 @@ class HomePage extends StatelessWidget {
               child: ListView(
                 children: [
                   TopSection(),
+                  AdvantagesSection(),
+                  CoursesSection(),
                 ],
               ),
             ),

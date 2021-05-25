@@ -154,7 +154,7 @@ class TopSection extends StatelessWidget {
         final maxWidth = constraints.maxWidth;
 
         return Visibility(
-          visible: maxWidth >= 1200,
+          visible: maxWidth >= tabletBreakpoint,
           child: _webTopSection,
           replacement: Visibility(
             visible: maxWidth >= mobileBreakpoint,
