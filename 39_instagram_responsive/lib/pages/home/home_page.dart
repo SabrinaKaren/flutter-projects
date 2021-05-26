@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_responsive/pages/home/widgets/post_item.dart';
 import 'package:instagram_responsive/pages/home/widgets/responsive_app_bar.dart';
+import 'package:instagram_responsive/pages/home/widgets/right_panel.dart';
 import 'package:instagram_responsive/pages/home/widgets/stories_list.dart';
 
 class HomePage extends StatelessWidget {
@@ -18,14 +19,31 @@ class HomePage extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 1000),
-          child: ListView(
+          child: Row(
             children: [
-              StoriesList(),
-              PostItem(),
-              PostItem(),
-              PostItem(),
-              PostItem(),
-              PostItem(),
+              Expanded(
+                child: ListView(
+                  children: [
+                    StoriesList(),
+                    PostItem(),
+                    PostItem(),
+                    PostItem(),
+                    PostItem(),
+                    PostItem(),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black87,
+                      blurRadius: 7,
+                    ),
+                  ],
+                ),
+                child: RightPanel(),
+              ),
             ],
           ),
         ),
