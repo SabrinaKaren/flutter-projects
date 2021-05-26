@@ -2,6 +2,8 @@
   Sabrina Karen
 */
 
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:instagram_responsive/pages/home/home_page.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
       builder: (context, widget) => ResponsiveWrapper.builder(
         ClampingScrollWrapper.builder(context, widget),
         defaultScale: true,
+        defaultName: MOBILE,
         minWidth: 450,
         breakpoints: [
           ResponsiveBreakpoint.resize(450, name: MOBILE),

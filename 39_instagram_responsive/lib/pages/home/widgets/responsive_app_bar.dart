@@ -47,40 +47,42 @@ class ResponsiveAppBar extends StatelessWidget {
     return AppBar(
       backgroundColor: Colors.black,
       elevation: 1,
-      title: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 1000),
-        child: Row(
-          children: [
-            Expanded(
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Text(
-                  'Flutter',
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.white,
-                    fontFamily: 'Billabong',
-                    fontWeight: FontWeight.w500,
+      title: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 1000),
+          child: Row(
+            children: [
+              Expanded(
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Text(
+                    'Flutter',
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.white,
+                      fontFamily: 'Billabong',
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
-            ),
-            ResponsiveVisibility(
-              visible: false,
-              visibleWhen: [
-                Condition.largerThan(name: MOBILE),
-              ],
-              child: _searchField,
-            ),
-            ResponsiveVisibility(
-              visible: false,
-              visibleWhen: [
-                Condition.largerThan(name: MOBILE),
-              ],
-              child: Expanded(child: ResponsiveRightIcons()),
-              replacement: ResponsiveRightIcons(),
-            ),
-          ],
+              ResponsiveVisibility(
+                visible: false,
+                visibleWhen: [
+                  Condition.largerThan(name: MOBILE),
+                ],
+                child: _searchField,
+              ),
+              ResponsiveVisibility(
+                visible: false,
+                visibleWhen: [
+                  Condition.largerThan(name: MOBILE),
+                ],
+                child: Expanded(child: ResponsiveRightIcons()),
+                replacement: ResponsiveRightIcons(),
+              ),
+            ],
+          ),
         ),
       ),
     );
