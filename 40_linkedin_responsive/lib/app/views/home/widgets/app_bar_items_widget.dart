@@ -12,11 +12,11 @@ class AppBarItemsWidget extends StatelessWidget {
     Column _getItemWidget(IconData icon, String title) {
       return Column(
         children: [
-          Icon(icon, color: Colors.black),
+          Icon(icon, color: Colors.grey[800]),
           Text(
             title,
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.grey[800],
               fontSize: 10,
             ),
           ),
@@ -24,7 +24,26 @@ class AppBarItemsWidget extends StatelessWidget {
       );
     }
 
+    Widget _profileItem = Column(
+      children: [
+        Icon(Icons.person, color: Colors.grey[800]),
+        Row(
+          children: [
+            Text(
+              'Eu',
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 10,
+              ),
+            ),
+            Icon(Icons.arrow_drop_down, color: Colors.grey[800]),
+          ],
+        ),
+      ],
+    );
+
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         _getItemWidget(Icons.home, 'Início'),
         const SizedBox(width: 4),
@@ -36,7 +55,7 @@ class AppBarItemsWidget extends StatelessWidget {
         const SizedBox(width: 4),
         _getItemWidget(Icons.notifications, 'Notificações'),
         const SizedBox(width: 4),
-        _getItemWidget(Icons.person, 'Eu'),
+        _profileItem,
       ],
     );
 
