@@ -50,11 +50,9 @@ class AppBarWidget extends StatelessWidget {
 
     Widget _webAppBar = Row(
       children: [
-        Expanded(
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Image.asset('assets/linkedin_icon_01.png', height: 40),
-          ),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Image.asset('assets/linkedin_icon_01.png', height: 40),
         ),
         const SizedBox(width: 4),
         _searchBox,

@@ -2,31 +2,45 @@
   Sabrina Karen
 */
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppBarItemsWidget extends StatelessWidget {
 
+  bool selectedHome = true;
+  bool selectedMyNetwork = false;
+  bool selectedVacations = false;
+  bool selectedMessages = false;
+  bool selectedNotifications = false;
+
   @override
   Widget build(BuildContext context) {
 
-    Column _getItemWidget(IconData icon, String title) {
-      return Column(
-        children: [
-          Icon(icon, color: Colors.grey[800]),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey[800],
-              fontSize: 10,
+    Padding _getItemWidget(IconData icon, String title, bool selected) {
+      return Padding(
+        padding: EdgeInsets.only(right: 10),
+        child: Column(
+          children: [
+            Icon(icon, color: selected ? Colors.black : Colors.grey[800]),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 10,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
     Widget _profileItem = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(Icons.person, color: Colors.grey[800]),
+        CircleAvatar(
+          radius: 13,
+          backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+        ),
         Row(
           children: [
             Text(
@@ -36,7 +50,7 @@ class AppBarItemsWidget extends StatelessWidget {
                 fontSize: 10,
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: Colors.grey[800]),
+            Icon(Icons.arrow_drop_down, color: Colors.grey[800], size: 15),
           ],
         ),
       ],
@@ -45,16 +59,11 @@ class AppBarItemsWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _getItemWidget(Icons.home, 'Início'),
-        const SizedBox(width: 4),
-        _getItemWidget(Icons.people, 'Minha rede'),
-        const SizedBox(width: 4),
-        _getItemWidget(Icons.wallet_travel_rounded, 'Vagas'),
-        const SizedBox(width: 4),
-        _getItemWidget(Icons.message, 'Mensagens'),
-        const SizedBox(width: 4),
-        _getItemWidget(Icons.notifications, 'Notificações'),
-        const SizedBox(width: 4),
+        _getItemWidget(Icons.home, 'Início', selectedHome),
+        _getItemWidget(Icons.people, 'Minha rede', selectedMyNetwork),
+        _getItemWidget(Icons.wallet_travel_rounded, 'Vagas', selectedVacations),
+        _getItemWidget(Icons.message, 'Mensagens', selectedMessages),
+        _getItemWidget(Icons.notifications, 'Notificações', selectedNotifications),
         _profileItem,
       ],
     );
