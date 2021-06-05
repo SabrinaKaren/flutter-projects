@@ -3,7 +3,8 @@
 */
 
 import 'package:flutter/material.dart';
-import 'package:linkedin_responsive/app/views/home/widgets/app_bar_items_widget.dart';
+import 'app_bar_items_widget.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class AppBarWidget extends StatelessWidget {
 
@@ -41,11 +42,11 @@ class AppBarWidget extends StatelessWidget {
     );
 
     Widget _mobileAppBar = Container(
-
+      child: Text('mobile', style: TextStyle(color: Colors.red)),
     );
 
     Widget _tabletAppBar = Container(
-
+      child: Text('tablet', style: TextStyle(color: Colors.red)),
     );
 
     Widget _webAppBar = Row(
@@ -67,7 +68,22 @@ class AppBarWidget extends StatelessWidget {
       title: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 1000),
-          child: _webAppBar,
+          child: ResponsiveVisibility(
+            visible: false,
+            visibleWhen: [
+              Condition.smallerThan(name: MOBILE),
+            ],
+            child: _mobileAppBar,
+            replacement: ResponsiveVisibility(
+              visible: false,
+              visibleWhen: [
+                //Condition.largerThan(name: MOBILE),
+                Condition.smallerThan(name: TABLET),
+              ],
+              child: _tabletAppBar,
+              replacement: _webAppBar,
+            ),
+          ),
         ),
       ),
     );
