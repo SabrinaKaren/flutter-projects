@@ -15,38 +15,54 @@ class AppBarWidget extends StatelessWidget {
     final isSmallerTablet = ResponsiveWrapper.of(context).activeBreakpoint.name == 'SMALLER_TABLET' ? true : false;
     final isDesktop = ResponsiveWrapper.of(context).isDesktop;
 
-    Widget _searchBox = Container(
-      width: 200,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Color(0xffE0ECF9),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      alignment: Alignment.centerLeft,
-      padding: EdgeInsets.only(left: 4),
-      child: Row(
-        children: [
-          Icon(Icons.search, color: Colors.grey[800]),
-          const SizedBox(width: 4),
-          Expanded(
-            child: TextField(
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                isCollapsed: true,
-                hintText: 'Pesquisar',
+    Widget _searchBox = Expanded(
+      child: Container(
+        height: 40,
+        decoration: BoxDecoration(
+          color: Color(0xffE0ECF9),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: 8),
+        child: Row(
+          children: [
+            Icon(Icons.search, color: Colors.grey[800]),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                  hintText: 'Pesquisar',
+                ),
               ),
             ),
-          ),
-        ],
+            Container(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(Icons.qr_code, color: Colors.grey[800]),
+            ),
+          ],
+        ),
       ),
     );
 
     Widget _mobileAppBar = Container(
-      child: Text('mobile', style: TextStyle(color: Colors.red)),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+          ),
+          const SizedBox(width: 15),
+          _searchBox,
+          const SizedBox(width: 15),
+          Icon(Icons.sms_outlined, color: Colors.grey[800]),
+        ],
+      ),
     );
 
     Widget _webTabletAppBar = Row(
