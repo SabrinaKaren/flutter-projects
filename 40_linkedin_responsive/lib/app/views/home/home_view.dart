@@ -3,6 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_wrapper.dart';
 import '../../app_bar/app_bar_widget.dart';
 
 class HomeView extends StatefulWidget {
@@ -14,6 +15,8 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+
+    print('activeBreakpoint: ' + ResponsiveWrapper.of(context).activeBreakpoint.name);
 
     return Scaffold(
       backgroundColor: Color(0xFFF3F2EF),

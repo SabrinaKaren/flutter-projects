@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:linkedin_responsive/app/models/app_bar_item_model.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class AppBarItemsWeb extends StatefulWidget {
   @override
@@ -45,90 +46,102 @@ class _AppBarItemsWebState extends State<AppBarItemsWeb> {
       selectedSearch = false;
     }
 
-    GestureDetector _getSearchItem(bool selected) {
-      return GestureDetector(
-        child: MouseRegion(
-          child: Column(
-            children: [
-              Icon(Icons.search, color: Colors.grey[800]),
-              Text(
-                'Pesquisar',
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: 10,
+    ResponsiveVisibility _getSearchItem(bool selected) {
+      return ResponsiveVisibility(
+        visible: false,
+        child: GestureDetector(
+          child: MouseRegion(
+            child: Column(
+              children: [
+                Icon(Icons.search, color: Colors.grey[800]),
+                Text(
+                  'Pesquisar',
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: 10,
+                  ),
                 ),
+              ],
+            ),
+            cursor: SystemMouseCursors.click,
+          ),
+          onTap: () {
+            setState(() {
+              _setFalseSelectedInAll();
+              selectedSearch = true;
+            });
+          },
+        ),
+        visibleWhen: [
+          Condition.smallerThan(name: TABLET),
+        ],
+      );
+    }
+
+    MouseRegion _getProfileItem(bool selected) {
+      return MouseRegion(
+        child: GestureDetector(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 13,
+                backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+              ),
+              Row(
+                children: [
+                  Text(
+                    'Eu',
+                    style: TextStyle(
+                      color: selected ? Colors.black : Colors.grey[600],
+                      fontSize: 10,
+                    ),
+                  ),
+                  Icon(Icons.arrow_drop_down, color: selected ? Colors.black : Colors.grey[600], size: 15),
+                ],
               ),
             ],
           ),
-          cursor: SystemMouseCursors.click,
+          onTap: () {
+            setState(() {
+              _setFalseSelectedInAll();
+              selectedMe = true;
+            });
+          },
         ),
-        onTap: () {
-          setState(() {
-            _setFalseSelectedInAll();
-            selectedSearch = true;
-          });
-        },
+        cursor: SystemMouseCursors.click,
       );
     }
 
-    GestureDetector _getProfileItem(bool selected) {
-      return GestureDetector(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 13,
-              backgroundImage: AssetImage('assets/my_profile_01.jpg'),
-            ),
-            Row(
-              children: [
-                Text(
-                  'Eu',
-                  style: TextStyle(
-                    color: selected ? Colors.black : Colors.grey[600],
-                    fontSize: 10,
+    MouseRegion _getSolutions(bool selected) {
+      return MouseRegion(
+        child: GestureDetector(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.apps, color: selected ? Colors.black : Colors.grey[600]),
+              Row(
+                children: [
+                  Text(
+                    'Soluções',
+                    style: TextStyle(
+                      color: selected ? Colors.black : Colors.grey[600],
+                      fontSize: 10,
+                    ),
                   ),
-                ),
-                Icon(Icons.arrow_drop_down, color: selected ? Colors.black : Colors.grey[600], size: 15),
-              ],
-            ),
-          ],
+                  Icon(Icons.arrow_drop_down, color: selected ? Colors.black : Colors.grey[600], size: 15),
+                ],
+              ),
+            ],
+          ),
+          onTap: () {
+            setState(() {
+              _setFalseSelectedInAll();
+              selectedSolutions = true;
+            });
+          },
         ),
-        onTap: () {
-          setState(() {
-            _setFalseSelectedInAll();
-            selectedMe = true;
-          });
-        },
-      );
-    }
-
-    GestureDetector _getSolutions(bool selected) {
-      return GestureDetector(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(Icons.apps, color: selected ? Colors.black : Colors.grey[600]),
-            Row(
-              children: [
-                Text(
-                  'Soluções',
-                  style: TextStyle(
-                    color: selected ? Colors.black : Colors.grey[600],
-                    fontSize: 10,
-                  ),
-                ),
-                Icon(Icons.arrow_drop_down, color: selected ? Colors.black : Colors.grey[600], size: 15),
-              ],
-            ),
-          ],
-        ),
-        onTap: () {
-          setState(() {
-            _setFalseSelectedInAll();
-            selectedSolutions = true;
-          });
-        },
+        cursor: SystemMouseCursors.click,
       );
     }
 

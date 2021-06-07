@@ -11,7 +11,8 @@ class AppBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final isTablet = ResponsiveWrapper.of(context).isTablet;
+    final isMobile = ResponsiveWrapper.of(context).isMobile;
+    final isSmallerTablet = ResponsiveWrapper.of(context).activeBreakpoint.name == 'SMALLER_TABLET' ? true : false;
     final isDesktop = ResponsiveWrapper.of(context).isDesktop;
 
     Widget _searchBox = Container(
@@ -59,10 +60,12 @@ class AppBarWidget extends StatelessWidget {
           visible: false,
           child: _searchBox,
           visibleWhen: [
-            Condition.largerThan(name: TABLET),
+            Condition.largerThan(name: 'SMALLER_TABLET'),
           ],
         ),
-        SizedBox(width: isDesktop ? 160 : 20),
+        //SizedBox(width: isSmallerTablet ? 100 : 160),
+        SizedBox(width: isDesktop ? 160
+            : isSmallerTablet ? 80 : 50),
         Expanded(child: AppBarItemsWeb()),
       ],
     );
@@ -73,11 +76,8 @@ class AppBarWidget extends StatelessWidget {
       title: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 1000),
-          child: ResponsiveVisibility(
-            visible: false,
-            visibleWhen: [
-              Condition.smallerThan(name: MOBILE),
-            ],
+          child: Visibility(
+            visible: isMobile,
             child: _mobileAppBar,
             replacement: _webTabletAppBar,
           ),
