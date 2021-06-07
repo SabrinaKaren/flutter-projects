@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:responsive_framework/utils/scroll_behavior.dart';
-import 'app/views/home/home_view.dart';
+import 'app/views/base_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Linkedin responsive',
       debugShowCheckedModeBanner: false,
-      home: HomeView(),
+      home: BaseView(),
       builder: (context, widget) => ResponsiveWrapper.builder(
         ClampingScrollWrapper.builder(context, widget),
         defaultScale: true,

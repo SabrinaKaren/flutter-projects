@@ -52,6 +52,16 @@ flutter:
   assets:
     - assets/linkedin_icon_01.png
     - assets/my_profile_01.jpg
+    - assets/profile_01.jpg
+    - assets/profile_02.jpg
+    - assets/profile_03.jpg
+    - assets/profile_04.jpg
+    - assets/profile_05.jpg
+    - assets/post_img_01.jpg
+    - assets/post_img_02.jpg
+    - assets/post_img_03.jpg
+    - assets/post_img_04.jpg
+    - assets/post_img_05.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
