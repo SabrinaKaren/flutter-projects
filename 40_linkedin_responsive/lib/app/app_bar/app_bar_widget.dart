@@ -3,13 +3,16 @@
 */
 
 import 'package:flutter/material.dart';
-import 'app_bar_items_widget.dart';
+import 'items/app_bar_items_web.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class AppBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final isTablet = ResponsiveWrapper.of(context).isTablet;
+    final isDesktop = ResponsiveWrapper.of(context).isDesktop;
 
     Widget _searchBox = Container(
       width: 200,
@@ -45,20 +48,22 @@ class AppBarWidget extends StatelessWidget {
       child: Text('mobile', style: TextStyle(color: Colors.red)),
     );
 
-    Widget _tabletAppBar = Container(
-      child: Text('tablet', style: TextStyle(color: Colors.red)),
-    );
-
-    Widget _webAppBar = Row(
+    Widget _webTabletAppBar = Row(
       children: [
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: Image.asset('assets/linkedin_icon_01.png', height: 40),
         ),
         const SizedBox(width: 4),
-        _searchBox,
-        const SizedBox(width: 4),
-        Expanded(child: AppBarItemsWidget()),
+        ResponsiveVisibility(
+          visible: false,
+          child: _searchBox,
+          visibleWhen: [
+            Condition.largerThan(name: TABLET),
+          ],
+        ),
+        SizedBox(width: isDesktop ? 160 : 20),
+        Expanded(child: AppBarItemsWeb()),
       ],
     );
 
@@ -74,15 +79,7 @@ class AppBarWidget extends StatelessWidget {
               Condition.smallerThan(name: MOBILE),
             ],
             child: _mobileAppBar,
-            replacement: ResponsiveVisibility(
-              visible: false,
-              visibleWhen: [
-                //Condition.largerThan(name: MOBILE),
-                Condition.smallerThan(name: TABLET),
-              ],
-              child: _tabletAppBar,
-              replacement: _webAppBar,
-            ),
+            replacement: _webTabletAppBar,
           ),
         ),
       ),
