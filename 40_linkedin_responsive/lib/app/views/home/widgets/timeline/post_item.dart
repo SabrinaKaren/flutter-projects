@@ -26,7 +26,7 @@ class _PostItemState extends State<PostItem> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: Colors.grey[400]),
       ),
       child: Column(
         children: [

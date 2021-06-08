@@ -26,7 +26,7 @@ class _TimeLineState extends State<TimeLine> {
   @override
   Widget build(BuildContext context) {
 
-    return Container(
+    return Expanded(
       child: ListView.builder(
         itemCount: postsList.length,
         itemBuilder: (context, index) {
