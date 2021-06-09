@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:linkedin_responsive/app/models/post_model.dart';
-import 'package:linkedin_responsive/app/models/profile_identification_model.dart';
 import 'package:linkedin_responsive/app/views/home/widgets/timeline/post_item.dart';
 import 'package:linkedin_responsive/app/views/home/widgets/timeline/posts_mock.dart';
 
@@ -29,6 +28,7 @@ class _TimeLineState extends State<TimeLine> {
     return Expanded(
       child: ListView.builder(
         shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemCount: postsList.length,
         itemBuilder: (context, index) {
           return PostItem(postObject: postsList[index]);

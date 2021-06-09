@@ -182,7 +182,7 @@ class LeftDiscoveryCard extends StatelessWidget {
           _secondSection,
           _thirdSection,
           _fourthSection,
-          Divider(color: Colors.red,),
+          Divider(),
           MouseRegion(
             child: GestureDetector(
               child: Center(

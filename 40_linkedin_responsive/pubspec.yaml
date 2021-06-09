@@ -66,6 +66,12 @@ flutter:
     - assets/premium_01.png
     - assets/people_icon_01.png
     - assets/tag_icon_01.png
+    - assets/applause_icon_01.png
+    - assets/brilliant_icon_01.png
+    - assets/heart_icon_01.png
+    - assets/interesting_icon_01.png
+    - assets/like_icon_01.png
+    - assets/support_icon_01.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

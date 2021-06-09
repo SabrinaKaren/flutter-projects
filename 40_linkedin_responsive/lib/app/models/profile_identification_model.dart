@@ -45,31 +45,44 @@ class ProfileIdentificationModel {
     );
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundImage: AssetImage(profileIdentificationObject.profileImgPath),
-        ),
-        const SizedBox(width: 20),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              profileIdentificationObject.name,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+            CircleAvatar(
+              radius: 28,
+              backgroundImage: AssetImage(profileIdentificationObject.profileImgPath),
             ),
-            Text(
-              profileIdentificationObject.occupation,
-              style: TextStyle(
-                color: Colors.grey[700],
-              ),
+            const SizedBox(width: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  profileIdentificationObject.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  profileIdentificationObject.occupation,
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                  ),
+                ),
+                _moment,
+              ],
             ),
-            _moment,
           ],
+        ),
+        MouseRegion(
+          child: GestureDetector(
+            child: Icon(Icons.more_horiz_rounded, color: Colors.grey[700], size: 28),
+            onTap: () => print('Options'),
+          ),
+          cursor: SystemMouseCursors.click,
         ),
       ],
     );
