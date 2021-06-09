@@ -28,6 +28,7 @@ class _TimeLineState extends State<TimeLine> {
 
     return Expanded(
       child: ListView.builder(
+        shrinkWrap: true,
         itemCount: postsList.length,
         itemBuilder: (context, index) {
           return PostItem(postObject: postsList[index]);

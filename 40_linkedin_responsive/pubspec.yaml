@@ -64,6 +64,8 @@ flutter:
     - assets/post_img_05.jpg
     - assets/cover_01.jpg
     - assets/premium_01.png
+    - assets/people_icon_01.png
+    - assets/tag_icon_01.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
