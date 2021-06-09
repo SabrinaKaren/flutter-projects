@@ -87,6 +87,7 @@ class _AppBarItemsWebState extends State<AppBarItemsWeb> {
               CircleAvatar(
                 radius: 13,
                 backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+                backgroundColor: Colors.transparent,
               ),
               Row(
                 children: [

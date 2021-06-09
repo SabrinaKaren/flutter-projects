@@ -72,6 +72,14 @@ flutter:
     - assets/interesting_icon_01.png
     - assets/like_icon_01.png
     - assets/support_icon_01.png
+    - assets/comment_icon_01.png
+    - assets/like_icon_02.png
+    - assets/share_icon_01.png
+    - assets/submit_icon_01.png
+    - assets/article_icon_01.png
+    - assets/event_icon_01.png
+    - assets/photo_icon_01.png
+    - assets/video_icon_01.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

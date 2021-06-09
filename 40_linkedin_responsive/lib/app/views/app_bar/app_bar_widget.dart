@@ -86,6 +86,7 @@ class AppBarWidget extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+            backgroundColor: Colors.transparent,
           ),
           const SizedBox(width: 15),
           _mobileSearchBox,

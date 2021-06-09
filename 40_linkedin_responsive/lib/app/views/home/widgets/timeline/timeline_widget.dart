@@ -25,15 +25,13 @@ class _TimeLineState extends State<TimeLine> {
   @override
   Widget build(BuildContext context) {
 
-    return Expanded(
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: postsList.length,
-        itemBuilder: (context, index) {
-          return PostItem(postObject: postsList[index]);
-        },
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: postsList.length,
+      itemBuilder: (context, index) {
+        return PostItem(postObject: postsList[index]);
+      },
     );
 
   }

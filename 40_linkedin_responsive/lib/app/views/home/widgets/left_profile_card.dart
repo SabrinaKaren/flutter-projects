@@ -20,6 +20,7 @@ class LeftProfileCard extends StatelessWidget {
             child: CircleAvatar(
               radius: 40,
               backgroundImage: AssetImage('assets/my_profile_01.jpg'),
+              backgroundColor: Colors.transparent,
             ),
           ),
         ],

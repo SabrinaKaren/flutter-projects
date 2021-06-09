@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:linkedin_responsive/app/models/post_model.dart';
 import 'package:linkedin_responsive/app/models/profile_identification_model.dart';
+import 'package:linkedin_responsive/app/views/home/widgets/timeline/post_item_actions.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class PostItem extends StatefulWidget {
   final PostModel postObject;
@@ -28,47 +30,55 @@ class _PostItemState extends State<PostItem> {
   @override
   Widget build(BuildContext context) {
 
-    Row _reactions = Row(
-      children: [
-        Image.asset('assets/like_icon_01.png', height: 19),
-        const SizedBox(width: 5),
-        Image.asset('assets/applause_icon_01.png', height: 19),
-        const SizedBox(width: 5),
-        Image.asset('assets/brilliant_icon_01.png', height: 19),
-        const SizedBox(width: 5),
-        MouseRegion(
-          child: InkWell(
-            child: Text(
-              '809',
+    final isMobile = ResponsiveWrapper.of(context).isMobile;
+
+    MouseRegion _reactions = MouseRegion(
+      child: GestureDetector(
+        child: Row(
+          children: [
+            Image.asset('assets/like_icon_01.png', height: 19),
+            const SizedBox(width: 5),
+            Image.asset('assets/applause_icon_01.png', height: 19),
+            const SizedBox(width: 5),
+            Image.asset('assets/brilliant_icon_01.png', height: 19),
+            const SizedBox(width: 5),
+            MouseRegion(
+              child: InkWell(
+                child: Text(
+                  '809',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                  ),
+                ),
+                onTap: () => print('Reações'),
+              ),
+              cursor: SystemMouseCursors.click,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              '•',
               style: TextStyle(
                 color: Colors.grey[600],
               ),
             ),
-            onTap: () => print('Reações'),
-          ),
-          cursor: SystemMouseCursors.click,
-        ),
-        const SizedBox(width: 5),
-        Text(
-          '•',
-          style: TextStyle(
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(width: 5),
-        MouseRegion(
-          child: InkWell(
-            child: Text(
-              '18 comentários',
-              style: TextStyle(
-                color: Colors.grey[600],
+            const SizedBox(width: 5),
+            MouseRegion(
+              child: InkWell(
+                child: Text(
+                  '18 comentários',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                  ),
+                ),
+                onTap: () => print('Comentários'),
               ),
+              cursor: SystemMouseCursors.click,
             ),
-            onTap: () => print('Comentários'),
-          ),
-          cursor: SystemMouseCursors.click,
+          ],
         ),
-      ],
+        onTap: () => print('Reações'),
+      ),
+      cursor: SystemMouseCursors.click,
     );
 
     return Padding(
@@ -86,7 +96,7 @@ class _PostItemState extends State<PostItem> {
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: [
-                  ProfileIdentificationModel().buildProfileWidget(widget.postObject.profileIdentificationObject),
+                  ProfileIdentificationModel().buildProfileWidget(widget.postObject.profileIdentificationObject, isMobile),
                   const SizedBox(height: 20),
                   Text(
                     widget.postObject.postText,
@@ -117,14 +127,16 @@ class _PostItemState extends State<PostItem> {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            Image.asset(widget.postObject.postImg),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Column(
                 children: [
-                  Image.asset(widget.postObject.postImg),
-                  const SizedBox(height: 10),
                   _reactions,
                   Divider(),
+                  const SizedBox(height: 5),
+                  PostItemActions(),
                 ],
               ),
             ),

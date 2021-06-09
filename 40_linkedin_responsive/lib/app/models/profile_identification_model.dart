@@ -18,7 +18,7 @@ class ProfileIdentificationModel {
   String occupation;
   String postMoment;
 
-  Widget buildProfileWidget(ProfileIdentificationModel profileIdentificationObject) {
+  Widget buildProfileWidget(ProfileIdentificationModel profileIdentificationObject, bool isMobile) {
 
     Widget _moment = Row(
       children: [
@@ -54,6 +54,7 @@ class ProfileIdentificationModel {
             CircleAvatar(
               radius: 28,
               backgroundImage: AssetImage(profileIdentificationObject.profileImgPath),
+              backgroundColor: Colors.transparent,
             ),
             const SizedBox(width: 20),
             Column(
@@ -77,12 +78,17 @@ class ProfileIdentificationModel {
             ),
           ],
         ),
-        MouseRegion(
-          child: GestureDetector(
-            child: Icon(Icons.more_horiz_rounded, color: Colors.grey[700], size: 28),
-            onTap: () => print('Options'),
+        Expanded(
+          child: Align(
+            alignment: Alignment.topRight,
+            child: MouseRegion(
+              child: GestureDetector(
+                child: Icon(isMobile ? Icons.more_vert_rounded : Icons.more_horiz_rounded, color: Colors.grey[700], size: 28),
+                onTap: () => print('Options'),
+              ),
+              cursor: SystemMouseCursors.click,
+            ),
           ),
-          cursor: SystemMouseCursors.click,
         ),
       ],
     );
