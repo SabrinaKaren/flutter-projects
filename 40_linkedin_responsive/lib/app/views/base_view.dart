@@ -3,6 +3,7 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:linkedin_responsive/app/views/bottom_navigation_bar/bottom_navigation_bar_widget.dart';
 import 'package:linkedin_responsive/app/views/home/home_view.dart';
 import 'package:responsive_framework/responsive_wrapper.dart';
 import '../views/app_bar/app_bar_widget.dart';
@@ -17,6 +18,7 @@ class _BaseViewState extends State<BaseView> {
   @override
   Widget build(BuildContext context) {
 
+    final isMobile = ResponsiveWrapper.of(context).isMobile;
     print('activeBreakpoint: ' + ResponsiveWrapper.of(context).activeBreakpoint.name);
 
     return Scaffold(
@@ -29,6 +31,7 @@ class _BaseViewState extends State<BaseView> {
           child: HomeView(),
         ),
       ),
+      bottomNavigationBar: isMobile ? BottomNavigationBarWidget() : null,
     );
 
   }
