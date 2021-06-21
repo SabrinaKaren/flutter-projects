@@ -36,7 +36,7 @@ Repositório público para compartilhamento de códigos iniciais desenvolvidos a
  - [Animacoes](/31_animacoes)
  - [iShow](/32_ishow_app)
  - [Olx](/33_olx)
- - [Get WhatsApp conversation](/34_get_whatsapp)
+ - [Get WhatsApp conversation](/34_get_whatsapp_provider)
  - [Trabalhando com mobx](/36_mobx_first)
  - [Login local com mobx](/37_mobx_login)
  - [Udemy responsive](/38_udemy_responsive)
