@@ -42,3 +42,4 @@ Repositório público para compartilhamento de códigos iniciais desenvolvidos a
  - [Udemy responsive](/38_udemy_responsive)
  - [Instagram responsive](/39_instagram_responsive)
  - [Linkedin responsive](/40_linkedin_responsive)
+ - [Leituras e pesagens](https://github.com/SabrinaKaren/readings_and_weighing)
